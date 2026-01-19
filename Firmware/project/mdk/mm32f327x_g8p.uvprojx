@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>MM32F3273G8P</Device>
           <Vendor>MindMotion</Vendor>
-          <PackID>MindMotion.MM32F3270_DFP.1.0.6</PackID>
+          <PackID>MindMotion.MM32F3270_DFP.1.0.5</PackID>
           <PackURL>http://www.mindmotion.com.cn/Download/MDK_KEIL/</PackURL>
           <Cpu>IRAM(0x20000000,0x20000) IROM(0x08000000,0x80000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -185,8 +185,6 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
-            <RvdsCdeCp>0</RvdsCdeCp>
-            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -353,7 +351,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <ClangAsOpt>4</ClangAsOpt>
+            <uClangAs>0</uClangAs>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -1224,6 +1222,66 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>App</GroupName>
+          <Files>
+            <File>
+              <FileName>Control.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\Control.c</FilePath>
+            </File>
+            <File>
+              <FileName>Control.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\Control.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Bsp</GroupName>
+          <Files>
+            <File>
+              <FileName>bsp_motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\bsp_motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_motor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\bsp_motor.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\bsp_encoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_encoder.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\bsp_encoder.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Config</GroupName>
+          <Files>
+            <File>
+              <FileName>pin_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\pin_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>param_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\param_config.h</FilePath>
+            </File>
+            <File>
+              <FileName>sys_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\sys_config.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
   </Targets>
@@ -1233,14 +1291,5 @@
     <components/>
     <files/>
   </RTE>
-
-  <LayerInfo>
-    <Layers>
-      <Layer>
-        <LayName>mm32f327x_g8p</LayName>
-        <LayPrjMark>1</LayPrjMark>
-      </Layer>
-    </Layers>
-  </LayerInfo>
 
 </Project>
