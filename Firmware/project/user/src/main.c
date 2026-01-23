@@ -41,19 +41,68 @@
 // 本例程是开源库移植用空工程
 
 // **************************** 代码区域 ****************************
+// *************************用户自定义包含****************************
+#include "bsp_led.h"
+#include "bsp_buzzer.h"
+#include "bsp_oled.h"
+
+#include "Menu.h"
+
+#include "test.h"
+// *************************用户自定义包含****************************
 int main(void)
 {
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
     debug_init();                                                               // 初始化默认 Debug UART
+    
+    // DEBUG
+    int32_t debug_count = 0;
+    // DEBUG
+
+    // TIM 与 Encoder
+    pit_ms_init(KEY_TIM,30);
+    interrupt_set_priority(KEY_PRIORITY, 0);
+    // TIM 与 Encoder
+
+    // 此处编写用户代码 例如外 设初始化代码等
+    key_init(10);
+    LED_Init();
+    Buzzer_Init();
+    OLED_Init();
+    Menu_Init();
 
     // 此处编写用户代码 例如外设初始化代码等
-    
-    // 此处编写用户代码 例如外设初始化代码等
+
+    // 自检
+    LED_On(ALL);
+    //Buzzer_On();
+
+    OLED_ShowString(0,0, "---------------------", OLED_6X8);
+	OLED_ShowString(0,24, "---------------------", OLED_6X8);
+    OLED_ShowString(0,6, "->SYSTEM START<-", OLED_8X16);
+	OLED_ShowString(0,32,"Team Member:",OLED_8X16);
+    OLED_ShowString(0,48,"aaa",OLED_6X8);
+    OLED_ShowString(0,56,"bbb",OLED_6X8);
+    OLED_ShowString(90,32,"11",OLED_8X16);
+    OLED_Update();
+
+    system_delay_ms(1000);
+    LED_Off(ALL);
+    Buzzer_Off();
+    // 自检
+
+    OLED_Clear();
 
     while(1)
     {
-        // 此处编写需要循环执行的代码
+        // Debug
         
+        debug_count++;
+        //test_key();
+
+        //Debug
+        // 此处编写需要循环执行的代码
+        Menu_Process();
         // 此处编写需要循环执行的代码
     }
 }

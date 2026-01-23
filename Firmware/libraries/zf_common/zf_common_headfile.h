@@ -111,7 +111,6 @@
 #include "zf_device_key.h"
 #include "zf_device_mpu6050.h"
 #include "zf_device_mt9v03x.h"
-#include "zf_device_oled.h"
 #include "zf_device_ov7725.h"
 #include "zf_device_scc8660.h"
 #include "zf_device_sdcard.h"
@@ -129,7 +128,9 @@
 //===================================================应用组件层===================================================
 
 //===================================================用户自定义文件===================================================
-
+#include "pin_config.h"
+#include "param_config.h"
+#include "sys_config.h"
 //===================================================用户自定义文件===================================================
 
 #endif

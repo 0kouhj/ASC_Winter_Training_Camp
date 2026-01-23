@@ -57,7 +57,7 @@
 #define PIT_PRIORITY            (TIM6_IRQn)                                     // 对应周期中断的中断编号 在 mm32f3277gx.h 头文件中查看 IRQn_Type 枚举体
 
 #define LED1                    (H2 )
-#define LED2                    (B13)
+#define LED2                    (B8)
 
 uint8 pit_state = 0;
 

@@ -63,7 +63,7 @@
 
 // **************************** 代码区域 ****************************
 #define LED1                    (H2 )
-#define LED2                    (B13)
+#define LED2                    (B8)
 
 #define KEY1                    (E2 )
 #define KEY2                    (E3 )
@@ -73,16 +73,20 @@
 #define SWITCH1                 (D3 )
 #define SWITCH2                 (D4 )
 
+volatile int debug_count = 1;
+
 int main (void)
 {
+
+    
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
     debug_init();                                                               // 初始化默认 Debug UART
 
     // 此处编写用户代码 例如外设初始化代码等
     uint16 delay_time = 0;
 
-    gpio_init(LED1, GPO, GPIO_HIGH, GPO_PUSH_PULL);                             // 初始化 LED1 输出 默认高电平 推挽输出模式
-    gpio_init(LED2, GPO, GPIO_HIGH, GPO_PUSH_PULL);                             // 初始化 LED2 输出 默认高电平 推挽输出模式
+    gpio_init(LED1, GPO, GPIO_LOW, GPO_PUSH_PULL);                             // 初始化 LED1 输出 默认高电平 推挽输出模式
+    gpio_init(LED2, GPO, GPIO_LOW, GPO_PUSH_PULL);                             // 初始化 LED2 输出 默认高电平 推挽输出模式
 
     gpio_init(KEY1, GPI, GPIO_HIGH, GPI_PULL_UP);                               // 初始化 KEY1 输入 默认高电平 上拉输入
     gpio_init(KEY2, GPI, GPIO_HIGH, GPI_PULL_UP);                               // 初始化 KEY2 输入 默认高电平 上拉输入
@@ -95,43 +99,10 @@ int main (void)
 
     while(1)
     {
-        // 此处编写需要循环执行的代码
-        delay_time = 100;                                                       // 延时时间复位
-        if(!gpio_get_level(SWITCH1))                                            // 获取 SWITCH1 电平为低
-        {
-            delay_time *= 2;                                                    // 延时时间翻 2 倍
-        }
-        if(!gpio_get_level(SWITCH2))                                            // 获取 SWITCH1 电平为低
-        {
-            delay_time *= 4;                                                    // 延时时间翻 4 倍
-        }
-
-        if( !gpio_get_level(KEY1) || !gpio_get_level(KEY2) || \
-            !gpio_get_level(KEY3) || !gpio_get_level(KEY4) )                    // 获取 KEYx 电平为低
-        {
-            gpio_set_level(LED1, GPIO_HIGH);
-            gpio_set_level(LED2, GPIO_HIGH);
-            while(1)
-            {
-                if( gpio_get_level(KEY1) && gpio_get_level(KEY2) && \
-                    gpio_get_level(KEY3) && gpio_get_level(KEY4) )              // 获取 KEYx 电平为高
-                {
-                    break;
-                }
-
-                system_delay_ms(500);                                           // 延时
-                gpio_toggle_level(LED2);                                        // 翻转 LED 引脚输出电平 控制 LED 亮灭
-                gpio_toggle_level(LED1);                                        // 翻转 LED 引脚输出电平 控制 LED 亮灭
-            }
-            gpio_set_level(LED1, GPIO_HIGH);
-            gpio_set_level(LED2, GPIO_LOW);
-        }
-
-        system_delay_ms(delay_time);                                            // 延时
-        gpio_toggle_level(LED1);                                                // 翻转 LED 引脚输出电平 控制 LED 亮灭
-        system_delay_ms(delay_time);                                            // 延时
-        gpio_toggle_level(LED2);                                                // 翻转 LED 引脚输出电平 控制 LED 亮灭
-        // 此处编写需要循环执行的代码
+        debug_count++;
+        gpio_toggle_level(LED1);
+        gpio_toggle_level(LED2);
+        system_delay_ms(1000);
     }
 }
 // **************************** 代码区域 ****************************
