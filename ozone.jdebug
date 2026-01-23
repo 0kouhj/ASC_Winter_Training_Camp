@@ -33,7 +33,7 @@ void OnProjectLoad (void) {
   //
   // User settings
   //
-  File.Open ("D:/MM32F327X_G8P.axf");
+  File.Open ("D:\files\ASC\Winter_Camp\GIT_FILE\Firmware\project\mdk\Objects\MM32F327X_G8P.axf");
 
 }
 

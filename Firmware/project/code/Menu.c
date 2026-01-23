@@ -14,7 +14,6 @@ uint8_t need_refresh = 1;  // 需要刷新显示标志
 
 // 警告模式状态
 static uint8_t warning_mode = 0;  // 是否处于警告模式
-static uint32_t warning_start_time = 0;  // 警告开始时间
 
 // 显示配置
 #define DISPLAY_LINES 6           // 显示总行数
@@ -43,7 +42,7 @@ static void IntToStr(uint16_t num, char *str)
     str[j] = '\0';
 }
 
-// 新增实时参数显示函数
+// 实时参数显示函数
 void Menu_DisplayRealtimeParams(void)
 {
     OLED_Clear();
@@ -133,7 +132,8 @@ void Menu_DisplayRealtimeParams(void)
     OLED_ShowString(110, 56, "P", OLED_6X8);
     IntToStr(realtime_state.current_page + 1, page_str);
     OLED_ShowString(116, 56, page_str, OLED_6X8);
-    OLED_ShowString(122, 56, "/2", OLED_6X8);
+    OLED_ShowString(122, 56, "/", OLED_6X8);
+    OLED_ShowNum(128,56,REAL_TIME_PAGE,1,OLED_6X8);
     
     OLED_Update();
 }
@@ -143,16 +143,26 @@ void Menu_Init(void)
 {
     // 创建菜单
     Menu *main_menu = Menu_Create("Main Menu");
-    Menu *test_menu = Menu_Create("Test Mode");
+    Menu *flash_menu = Menu_Create("Flash Menu");
+    Menu *go_menu = Menu_Create("Go!!!");
     
     // 主菜单
-    Menu_AddItem(main_menu, "DEBUG", MENU_ITEM_REALTIME_PARAMS, NULL, NULL);
-    Menu_AddItem(main_menu, "Test", MENU_ITEM_SUBMENU, test_menu, NULL);
-    Menu_AddItem(main_menu, "RESET", MENU_ITEM_SUBMENU, NULL, NULL);
-    
-	//Test菜单
-	Menu_AddItem(test_menu, "Motor Test",MENU_ITEM_SUBMENU,NULL,NULL);
+    Menu_AddItem(main_menu, "Info", MENU_ITEM_REALTIME_PARAMS, NULL, NULL);
+    Menu_AddItem(main_menu, "Flash", MENU_ITEM_SUBMENU,flash_menu,NULL);
+    Menu_AddItem(main_menu, "Go Car!", MENU_ITEM_SUBMENU,go_menu,NULL);
+    Menu_AddItem(main_menu, "Reset", MENU_ITEM_ACTION, NULL, NULL);
+
+    //Flash菜单
+    Menu_AddItem(flash_menu, "R Flash", MENU_ITEM_ACTION,NULL,NULL);
+    Menu_AddItem(flash_menu, "W Flash", MENU_ITEM_ACTION,NULL,NULL);
 	
+    //发车菜单
+    Menu_AddItem(go_menu, "Mode 1",MENU_ITEM_ACTION,NULL,NULL);
+    Menu_AddItem(go_menu, "Mode 2",MENU_ITEM_ACTION,NULL,NULL);
+    Menu_AddItem(go_menu, "Mode 3",MENU_ITEM_ACTION,NULL,NULL);
+    Menu_AddItem(go_menu, "Mode 4",MENU_ITEM_ACTION,NULL,NULL);
+    Menu_AddItem(go_menu, "Mode 5",MENU_ITEM_ACTION,NULL,NULL);
+    
     current_menu = main_menu;
     need_refresh = 1;
     
@@ -193,7 +203,6 @@ void Menu_Process(void)
         return;
     }
     
-    // 原有的菜单处理逻辑
     // 检查按键事件
     if (key_get_state(KEY_1) == KEY_SHORT_PRESS) {
         // 上移
@@ -262,7 +271,7 @@ void Menu_Process(void)
 // 显示电池信息和系统控制模式在右上角
 void Menu_DisplayBatteryInfo(void)
 {
-    
+
 }
 
 // 刷新显示

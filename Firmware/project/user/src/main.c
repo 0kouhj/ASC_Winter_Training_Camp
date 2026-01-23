@@ -50,21 +50,26 @@
 
 #include "test.h"
 // *************************用户自定义包含****************************
+
+// 函数声明
+void oled_start(void);
+// 函数声明
+
+// DEBUG
+int32_t debug_count = 0;
+// DEBUG
+
 int main(void)
 {
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
     debug_init();                                                               // 初始化默认 Debug UART
     
-    // DEBUG
-    int32_t debug_count = 0;
-    // DEBUG
-
     // TIM 与 Encoder
-    pit_ms_init(KEY_TIM,30);
+    pit_ms_init(KEY_TIM,30);                                                    // 使用TIM6进行按键扫描
     interrupt_set_priority(KEY_PRIORITY, 0);
     // TIM 与 Encoder
 
-    // 此处编写用户代码 例如外 设初始化代码等
+    // 此处编写用户代码 例如外设初始化代码等
     key_init(10);
     LED_Init();
     Buzzer_Init();
@@ -75,18 +80,11 @@ int main(void)
 
     // 自检
     LED_On(ALL);
-    //Buzzer_On();
-
-    OLED_ShowString(0,0, "---------------------", OLED_6X8);
-	OLED_ShowString(0,24, "---------------------", OLED_6X8);
-    OLED_ShowString(0,6, "->SYSTEM START<-", OLED_8X16);
-	OLED_ShowString(0,32,"Team Member:",OLED_8X16);
-    OLED_ShowString(0,48,"aaa",OLED_6X8);
-    OLED_ShowString(0,56,"bbb",OLED_6X8);
-    OLED_ShowString(90,32,"11",OLED_8X16);
-    OLED_Update();
+    Buzzer_On();
+    oled_start();
 
     system_delay_ms(1000);
+
     LED_Off(ALL);
     Buzzer_Off();
     // 自检
@@ -96,7 +94,6 @@ int main(void)
     while(1)
     {
         // Debug
-        
         debug_count++;
         //test_key();
 
@@ -107,3 +104,14 @@ int main(void)
     }
 }
 // **************************** 代码区域 ****************************
+void oled_start(void)
+{
+    OLED_ShowString(0,0, "---------------------", OLED_6X8);
+	OLED_ShowString(0,24, "---------------------", OLED_6X8);
+    OLED_ShowString(0,6, "->SYSTEM START<-", OLED_8X16);
+	OLED_ShowString(0,32,"Team Member:",OLED_8X16);
+    OLED_ShowString(0,48,"aaa",OLED_6X8);
+    OLED_ShowString(0,56,"bbb",OLED_6X8);
+    OLED_ShowString(90,32,"11",OLED_8X16);
+    OLED_Update();
+}

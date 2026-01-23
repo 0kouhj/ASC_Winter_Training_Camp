@@ -1352,6 +1352,11 @@
               <FileType>5</FileType>
               <FilePath>..\code\oled_data.h</FilePath>
             </File>
+            <File>
+              <FileName>param_config.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\param_config.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
