@@ -99,31 +99,13 @@ void Menu_DisplayRealtimeParams(void)
             OLED_ShowString(0, line*8, "R-Target:", OLED_6X8);
             //OLED_ShowSignedNum(54, line*8,motor_speed_data.right_actual_speed,3,OLED_6X8);
             line++;
-            // 系统控制模式
-            OLED_ShowString(0, line*8, "Mode:", OLED_6X8);
-            /*switch(system_status_packet.system_control_mode) {
-                case MODE_MANUAL: OLED_ShowString(30, line*8, "Manual", OLED_6X8); break;
-                case MODE_AUTO: OLED_ShowString(30, line*8, "Auto", OLED_6X8); break;
-                case MODE_BLUETOOTH: OLED_ShowString(30, line*8, "BT", OLED_6X8); break;
-                default: OLED_ShowString(30, line*8, "Unknown", OLED_6X8); break;
-            }
-            line++;*/
             break;
         }
             
         case 1:  // 第2页：传感器数据
         {
-            // 红外传感器
-            OLED_ShowString(0, line*8, "o", OLED_6X8);
-            for(int i = 0; i < 4; i++) {
-                //IntToStr(sensor_packet.ir_sensor_raw[i], ir_str);
-                OLED_ShowString(18 + i*24, line*8, ir_str, OLED_6X8);
-				if(i==1) OLED_ShowString(30,line*8,"L",OLED_6X8);
-				if(i==2) OLED_ShowString(54,line*8,"R",OLED_6X8);
-				if(i==3) OLED_ShowString(78,line*8,"V",OLED_6X8);
-				
-            }
-            line++;
+            OLED_ShowString(0,line*8,"ac_x_raw",OLED_6X8);
+            OLED_ShowSignedNum(80,line*8,Icm.accel_x_raw,5,OLED_6X8);
             break;
 		}
     }

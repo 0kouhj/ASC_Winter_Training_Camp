@@ -3,13 +3,34 @@
 
 #include "zf_common_headfile.h"
 
+typedef enum{
+    LED1,
+    LED2,
+    ALL
+}LED_LIST;
+
 /******* 以下为非FLASH储存的实时状态变量 *******/
+
+typedef struct {
+    // 原始数据
+    int16 accel_x_raw, accel_y_raw, accel_z_raw;
+    int16 gyro_x_raw, gyro_y_raw, gyro_z_raw;
+    
+    // 物理量
+    float accel_x_g, accel_y_g, accel_z_g;    // 单位: g
+    float gyro_x_dps, gyro_y_dps, gyro_z_dps; // 单位: deg/s
+    
+} ICM42688_t;
+
 typedef struct {
     // 传感器原始/融合数据
     float pitch;            // 当前俯仰角
     float roll;             // 当前横滚角
     float yaw;              // 当前航向角
     float gyro_y;           // Y轴角速度（平衡控制核心）
+
+    // 红外传感器
+    uint8_t infrared[6];
     
     // 动力系统状态
     int32_t encoder_left;   // 左电机总脉冲
@@ -108,7 +129,7 @@ typedef struct {
 // 声明全局变量
 extern SYSTEM_CONFIG_T Config;
 extern SYSTEM_STATE_T  State;
-
+extern ICM42688_t Icm;
 // 函数声明
 void Param_Init(void);
 void Param_SaveToFlash(void);

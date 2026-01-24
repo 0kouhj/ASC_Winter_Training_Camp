@@ -45,6 +45,7 @@
 #include "bsp_led.h"
 #include "bsp_buzzer.h"
 #include "bsp_oled.h"
+#include "bsp_imu.h"
 
 #include "Menu.h"
 
@@ -75,6 +76,7 @@ int main(void)
     Buzzer_Init();
     OLED_Init();
     Menu_Init();
+    
 
     // 此处编写用户代码 例如外设初始化代码等
 
@@ -82,9 +84,15 @@ int main(void)
     LED_On(ALL);
     Buzzer_On();
     oled_start();
-
-    system_delay_ms(1000);
-
+    if (ICM42688_I2C_Init() != 0) {
+        OLED_Clear();
+        OLED_ShowString(0, 0, "IMU ERROR!", OLED_8X16);
+        OLED_Update();
+        system_delay_ms(1000);
+    }
+    else{
+        system_delay_ms(1000);
+    }
     LED_Off(ALL);
     Buzzer_Off();
     // 自检
@@ -100,7 +108,9 @@ int main(void)
         //Debug
         // 此处编写需要循环执行的代码
         Menu_Process();
+        ICM42688_I2C_Read_Data(&Icm);
         // 此处编写需要循环执行的代码
+        system_delay_ms(10);
     }
 }
 // **************************** 代码区域 ****************************

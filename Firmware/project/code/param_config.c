@@ -3,6 +3,29 @@
 // 实例化全局变量
 SYSTEM_CONFIG_T Config;
 SYSTEM_STATE_T State;
+ICM42688_t Icm;
+/**
+ * @brief 初始化ICM42688的值
+ * @note  开机时调用
+ */
+void Icm42688_Init(void)
+{
+    // 原始数据清零
+    Icm.accel_x_raw = 0;
+    Icm.accel_y_raw = 0;
+    Icm.accel_z_raw = 0;
+    Icm.gyro_x_raw = 0;
+    Icm.gyro_y_raw = 0;
+    Icm.gyro_z_raw = 0;
+    
+    // 物理量清零
+    Icm.accel_x_g = 0.0f;
+    Icm.accel_y_g = 0.0f;
+    Icm.accel_z_g = 0.0f;
+    Icm.gyro_x_dps = 0.0f;
+    Icm.gyro_y_dps = 0.0f;
+    Icm.gyro_z_dps = 0.0f;
+}
 
 /**
  * @brief 实时状态初始化
