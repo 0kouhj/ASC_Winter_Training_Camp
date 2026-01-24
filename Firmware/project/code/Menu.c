@@ -182,6 +182,7 @@ void Menu_Init(void)
     //Flash菜单
     Menu_AddItem(flash_menu, "R Flash", MENU_ITEM_ACTION,NULL,NULL);
     Menu_AddItem(flash_menu, "W Flash", MENU_ITEM_ACTION,NULL,NULL);
+    Menu_AddItem(flash_menu, "C Flash", MENU_ITEM_ACTION,NULL,NULL);
 	
     //发车菜单
     Menu_AddItem(go_menu, "Mode 1",MENU_ITEM_ACTION,NULL,NULL);
