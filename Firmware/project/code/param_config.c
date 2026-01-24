@@ -47,6 +47,8 @@ void State_Init(void) {
     State.run_stage = 0;
     State.loop_count = 0;
     State.menu_index = 0;
+    State.battery_v = 0.0f;
+    State.system_tick = 0;
 }
 
 /**

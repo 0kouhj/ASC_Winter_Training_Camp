@@ -70,33 +70,24 @@ void Menu_DisplayRealtimeParams(void)
         {
             // 电池状态
             OLED_ShowString(0, line*8, "Bat:", OLED_6X8);
-            //IntToStr(system_status_packet.battery_level, bat_str);
-            OLED_ShowString(24, line*8, bat_str, OLED_6X8);
-            // 显示电压（整数部分.小数部分）
-            //volt_int = (uint16_t)system_status_packet.battery_voltage;
-            //volt_frac = (uint16_t)((system_status_packet.battery_voltage - volt_int) * 100);
-            IntToStr(volt_int, bat_str);
-            OLED_ShowString(54, line*8, bat_str, OLED_6X8);
-            OLED_ShowString(66, line*8, ".", OLED_6X8);
-            IntToStr(volt_frac, bat_str);
-            OLED_ShowString(72, line*8, bat_str, OLED_6X8);
-            OLED_ShowString(78, line*8, "V)", OLED_6X8);
+            OLED_ShowFloatNum(30, line*8, State.battery_v, 2, 2, OLED_6X8);
+            OLED_ShowString(68, line*8, "V", OLED_6X8);
             line++;
             // 左电机目标速度
             OLED_ShowString(0, line*8, "L-Target:", OLED_6X8);
-            //OLED_ShowSignedNum(54, line*8,motor_speed_data.left_target_speed,3,OLED_6X8);
+            OLED_ShowSignedNum(60, line*8, State.motor_target_speed_left, 5, OLED_6X8);
             line++;
             // 左电机实际速度
             OLED_ShowString(0, line*8, "L-Actual:", OLED_6X8);
-            //OLED_ShowSignedNum(54, line*8,motor_speed_data.left_actual_speed,3,OLED_6X8);
+            OLED_ShowSignedNum(60, line*8, State.motor_actual_speed_left, 5, OLED_6X8);
             line++;
             // 右电机目标速度
             OLED_ShowString(0, line*8, "R-Target:", OLED_6X8);
-            //OLED_ShowSignedNum(54, line*8,motor_speed_data.right_target_speed,3,OLED_6X8);
+            OLED_ShowSignedNum(60, line*8, State.motor_target_speed_right, 5, OLED_6X8);
             line++;
             // 右电机实际速度
-            OLED_ShowString(0, line*8, "R-Target:", OLED_6X8);
-            //OLED_ShowSignedNum(54, line*8,motor_speed_data.right_actual_speed,3,OLED_6X8);
+            OLED_ShowString(0, line*8, "R-Actual:", OLED_6X8);
+            OLED_ShowSignedNum(60, line*8, State.motor_actual_speed_right, 5, OLED_6X8);
             line++;
             break;
         }
@@ -200,7 +191,7 @@ void Menu_Init(void)
     Menu_AddItem(go_menu, "Mode 5",MENU_ITEM_ACTION,NULL,NULL);
     
     //Motor Test子菜单
-    Menu_AddItem(motor_test_menu, "Motor STOP", MENU_ITEM_SUBMENU,NULL,motor_stop);
+    Menu_AddItem(motor_test_menu, "Motor STOP", MENU_ITEM_ACTION,NULL,motor_stop);
     Menu_AddItem(motor_test_menu, "100",MENU_ITEM_ACTION,NULL,motor_test_100_100);
     Menu_AddItem(motor_test_menu,"-100",MENU_ITEM_ACTION,NULL,motor_test_neg100_neg100);
     Menu_AddItem(motor_test_menu, "50",MENU_ITEM_ACTION,NULL,motor_test_50_50);

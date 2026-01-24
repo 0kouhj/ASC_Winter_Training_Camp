@@ -47,6 +47,7 @@
 #include "bsp_oled.h"
 #include "bsp_imu.h"
 #include "bsp_motor.h"
+#include "bsp_battery.h"
 
 #include "kalman.h"
 
@@ -81,12 +82,10 @@ int main(void)
     key_init(10);
     LED_Init();
     Buzzer_Init();
+    battery_init();
     OLED_Init();
     Menu_Init();
-    Attitude_Init();
-
-    motor_set_left_speed(0);
-    motor_set_right_speed(0);
+    Attitude_Init();    motor_set_left_speed(0);
 
     // 此处编写用户代码 例如外设初始化代码等
 
@@ -125,7 +124,8 @@ int main(void)
         Menu_Process();
         ICM42688_I2C_Read_Data(&Icm);
         Attitude_Update(0.01f);
-        motor_update();        // 此处编写需要循环执行的代码
+        motor_update();
+        State.battery_v = battery_get_voltage();        // 此处编写需要循环执行的代码
         system_delay_ms(5);
     }
 }

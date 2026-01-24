@@ -93,15 +93,15 @@ void motor_update(void)
     if (State.motor_target_speed_right > 0)
     {
         // 前进
-        gpio_set_level(Motor_R_DIR1, 0);
-        gpio_set_level(Motor_R_DIR2, 1);
+        gpio_set_level(Motor_R_DIR1, 1);
+        gpio_set_level(Motor_R_DIR2, 0);
         pwm_set_duty(PWM_CH2, State.motor_target_speed_right);
     }
     else if (State.motor_target_speed_right < 0)
     {
         // 后退
-        gpio_set_level(Motor_R_DIR1, 1);
-        gpio_set_level(Motor_R_DIR2, 0);
+        gpio_set_level(Motor_R_DIR1, 0);
+        gpio_set_level(Motor_R_DIR2, 1);
         pwm_set_duty(PWM_CH2, -State.motor_target_speed_right);
     }
     else

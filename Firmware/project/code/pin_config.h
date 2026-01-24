@@ -2,6 +2,8 @@
 #define PIN_CONFIG_H
 
 //驱动定义
+#define BATTERY_ADC     (ADC2_CH14_C4)
+
 #define LED_1           (H2)
 #define LED_2           (B8)
 
@@ -33,6 +35,7 @@
 
 #define Motor_R_DIR1      (D5)
 #define Motor_R_DIR2      (D6)
+
 //软件定义
 
 #define KEY_TIM         (TIM6_PIT)
