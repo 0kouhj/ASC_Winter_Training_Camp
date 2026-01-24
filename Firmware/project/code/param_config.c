@@ -33,7 +33,10 @@ void Icm42688_Init(void)
  */
 void State_Init(void) {
     State.pitch = 0.0f;
+    State.roll = 0.0f;
     State.yaw = 0.0f;
+    State.gyro_x = 0.0f;
+    State.gyro_y = 0.0f;
     State.encoder_left = 0;
     State.encoder_right = 0;
     State.is_stop = 1;      // 开机默认锁定电机，保护安全

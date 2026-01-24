@@ -18,7 +18,7 @@ static uint8_t warning_mode = 0;  // 是否处于警告模式
 // 显示配置
 #define DISPLAY_LINES 6           // 显示总行数
 #define MENU_ITEMS_PER_PAGE 5     // 每页显示的菜单项数量
-#define REAL_TIME_PAGE 2
+#define REAL_TIME_PAGE 3
 //辅助函数
 static void IntToStr(uint16_t num, char *str)
 {
@@ -104,18 +104,63 @@ void Menu_DisplayRealtimeParams(void)
             
         case 1:  // 第2页：传感器数据
         {
-            OLED_ShowString(0,line*8,"ac_x_raw",OLED_6X8);
-            OLED_ShowSignedNum(80,line*8,Icm.accel_x_raw,5,OLED_6X8);
+            // 显示原始数据
+            OLED_ShowString(0,line*8,"axr:",OLED_6X8);
+            OLED_ShowSignedNum(24,line*8,Icm.accel_x_raw,4,OLED_6X8);
+            OLED_ShowString(67,line*8,"ayr:",OLED_6X8);
+            OLED_ShowSignedNum(91,line*8,Icm.accel_y_raw,4,OLED_6X8);
+            line++;
+            OLED_ShowString(0,line*8,"azr:",OLED_6X8);
+            OLED_ShowSignedNum(24,line*8,Icm.accel_z_raw,4,OLED_6X8);
+            OLED_ShowString(67,line*8,"gxr:",OLED_6X8);
+            OLED_ShowSignedNum(91,line*8,Icm.gyro_x_raw,4,OLED_6X8);
+            line++;
+            OLED_ShowString(0,line*8,"gyr:",OLED_6X8);
+            OLED_ShowSignedNum(24,line*8,Icm.gyro_y_raw,4,OLED_6X8);
+            OLED_ShowString(67,line*8,"gzr:",OLED_6X8);
+            OLED_ShowSignedNum(91,line*8,Icm.gyro_z_raw,4,OLED_6X8);
+            line++;
+            // 显示物理量
+            OLED_ShowString(0,line*8,"axg:",OLED_6X8);
+            OLED_ShowFloatNum(24,line*8,Icm.accel_x_g,1,2,OLED_6X8);
+            OLED_ShowString(67,line*8,"ayg:",OLED_6X8);
+            OLED_ShowFloatNum(91,line*8,Icm.accel_y_g,1,2,OLED_6X8);
+            line++;
+            OLED_ShowString(0,line*8,"azg:",OLED_6X8);
+            OLED_ShowFloatNum(24,line*8,Icm.accel_z_g,1,2,OLED_6X8);
+            OLED_ShowString(67,line*8,"gxd:",OLED_6X8);
+            OLED_ShowFloatNum(91,line*8,Icm.gyro_x_dps,3,1,OLED_6X8);
+            line++;
+            OLED_ShowString(0,line*8,"gyd:",OLED_6X8);
+            OLED_ShowFloatNum(24,line*8,Icm.gyro_y_dps,3,1,OLED_6X8);
+            OLED_ShowString(67,line*8,"gzd:",OLED_6X8);
+            OLED_ShowFloatNum(91,line*8,Icm.gyro_z_dps,3,1,OLED_6X8);
+            break;
+		}
+            
+        case 2:  // 第3页：解算数据
+        {
+            OLED_ShowString(0,line*8,"pitch:",OLED_6X8);
+            OLED_ShowFloatNum(50,line*8,State.pitch,3,2,OLED_6X8);
+            line++;
+            OLED_ShowString(0,line*8,"roll:",OLED_6X8);
+            OLED_ShowFloatNum(50,line*8,State.roll,3,2,OLED_6X8);
+            line++;
+            OLED_ShowString(0,line*8,"yaw:",OLED_6X8);
+            OLED_ShowFloatNum(50,line*8,State.yaw,3,2,OLED_6X8);
+            line++;
+            OLED_ShowString(0,line*8,"gyro_x:",OLED_6X8);
+            OLED_ShowFloatNum(50,line*8,State.gyro_x,3,2,OLED_6X8);
             break;
 		}
     }
     
     // 显示页码指示器
-    OLED_ShowString(110, 56, "P", OLED_6X8);
+    OLED_ShowString(104, 8, "P", OLED_6X8);
     IntToStr(realtime_state.current_page + 1, page_str);
-    OLED_ShowString(116, 56, page_str, OLED_6X8);
-    OLED_ShowString(122, 56, "/", OLED_6X8);
-    OLED_ShowNum(128,56,REAL_TIME_PAGE,1,OLED_6X8);
+    OLED_ShowString(110, 8, page_str, OLED_6X8);
+    OLED_ShowString(116, 8, "/", OLED_6X8);
+    OLED_ShowNum(122,8,REAL_TIME_PAGE,1,OLED_6X8);
     
     OLED_Update();
 }

@@ -47,13 +47,15 @@
 #include "bsp_oled.h"
 #include "bsp_imu.h"
 
+#include "kalman.h"
+
 #include "Menu.h"
 
 #include "test.h"
 // *************************用户自定义包含****************************
 
 // 函数声明
-void oled_start(void);
+void OLED_Start(void);
 // 函数声明
 
 // DEBUG
@@ -76,6 +78,7 @@ int main(void)
     Buzzer_Init();
     OLED_Init();
     Menu_Init();
+    Attitude_Init();
     
 
     // 此处编写用户代码 例如外设初始化代码等
@@ -83,7 +86,7 @@ int main(void)
     // 自检
     LED_On(ALL);
     Buzzer_On();
-    oled_start();
+    OLED_Start();
     if (ICM42688_I2C_Init() != 0) {
         OLED_Clear();
         OLED_ShowString(0, 0, "IMU ERROR!", OLED_8X16);
@@ -91,6 +94,9 @@ int main(void)
         system_delay_ms(1000);
     }
     else{
+        OLED_Clear();
+        OLED_ShowString(0, 0, "IMU OK!", OLED_8X16);
+        OLED_Update();
         system_delay_ms(1000);
     }
     LED_Off(ALL);
@@ -109,12 +115,13 @@ int main(void)
         // 此处编写需要循环执行的代码
         Menu_Process();
         ICM42688_I2C_Read_Data(&Icm);
+        Attitude_Update(0.01f);
         // 此处编写需要循环执行的代码
-        system_delay_ms(10);
+        system_delay_ms(5);
     }
 }
 // **************************** 代码区域 ****************************
-void oled_start(void)
+void OLED_Start(void)
 {
     OLED_ShowString(0,0, "---------------------", OLED_6X8);
 	OLED_ShowString(0,24, "---------------------", OLED_6X8);
