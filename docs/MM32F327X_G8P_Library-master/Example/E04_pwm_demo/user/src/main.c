@@ -72,28 +72,28 @@ int main (void)
     debug_init();                                                               // 初始化默认 debug uart
 
     // 此处编写用户代码 例如外设初始化代码等
-    pwm_init(PWM_CH1, 17000, 0);                                                // 初始化 PWM 通道 频率 17KHz 初始占空比 0%
-    pwm_init(PWM_CH2, 17000, 0);                                                // 初始化 PWM 通道 频率 17KHz 初始占空比 0%
-    pwm_init(PWM_CH3, 17000, 0);                                                // 初始化 PWM 通道 频率 17KHz 初始占空比 0%
-    pwm_init(PWM_CH4, 17000, 0);                                                // 初始化 PWM 通道 频率 17KHz 初始占空比 0%
+    pwm_init(PWM_CH1, 17000, 100);                                                // 初始化 PWM 通道 频率 17KHz 初始占空比 0%
+    pwm_init(PWM_CH2, 17000, 100);                                                // 初始化 PWM 通道 频率 17KHz 初始占空比 0%
+    pwm_init(PWM_CH3, 17000, 100);                                                // 初始化 PWM 通道 频率 17KHz 初始占空比 0%
+    pwm_init(PWM_CH4, 17000, 100);                                                // 初始化 PWM 通道 频率 17KHz 初始占空比 0%
     // 此处编写用户代码 例如外设初始化代码等
 
     while(1)
     {
-        // 此处编写需要循环执行的代码
-        for(channel_index = 0; CHANNEL_NUMBER > channel_index; channel_index ++)
-        {
-            for(duty = 0; PWM_DUTY_MAX / 2 >= duty; duty ++)                    // 输出占空比递增到 50%
-            {
-                pwm_set_duty(channel_list[channel_index], duty);                // 更新对应通道占空比
-                system_delay_us(100);
-            }
-            for(duty = PWM_DUTY_MAX / 2; 0 <= duty; duty --)                    // 输出占空比递减到 0%
-            {
-                pwm_set_duty(channel_list[channel_index], duty);                // 更新对应通道占空比
-                system_delay_us(100);
-            }
-        }
+//        // 此处编写需要循环执行的代码
+//        for(channel_index = 0; CHANNEL_NUMBER > channel_index; channel_index ++)
+//        {
+//            for(duty = 0; PWM_DUTY_MAX / 2 >= duty; duty ++)                    // 输出占空比递增到 50%
+//            {
+//                pwm_set_duty(channel_list[channel_index], duty);                // 更新对应通道占空比
+//                system_delay_us(100);
+//            }
+//            for(duty = PWM_DUTY_MAX / 2; 0 <= duty; duty --)                    // 输出占空比递减到 0%
+//            {
+//                pwm_set_duty(channel_list[channel_index], duty);                // 更新对应通道占空比
+//                system_delay_us(100);
+//            }
+//        }
         // 此处编写需要循环执行的代码
     }
 }

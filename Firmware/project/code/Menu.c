@@ -1,5 +1,6 @@
 #include "menu.h"
 #include "bsp_oled.h"
+#include "bsp_motor.h"
 #include "zf_device_key.h"
 #include <string.h>
 #include <stdlib.h>
@@ -60,8 +61,6 @@ void Menu_DisplayRealtimeParams(void)
     
     // 提前声明所有局部变量
     char bat_str[16];
-    char ir_str[4];
-    char pid_str[8];
     char page_str[4];
     uint16_t volt_int, volt_frac;
     
@@ -170,14 +169,24 @@ void Menu_Init(void)
 {
     // 创建菜单
     Menu *main_menu = Menu_Create("Main Menu");
+    Menu *test_menu = Menu_Create("Test Menu");
     Menu *flash_menu = Menu_Create("Flash Menu");
     Menu *go_menu = Menu_Create("Go!!!");
+
+    // Test子菜单
+    Menu *motor_test_menu = Menu_Create("Motor Test");
     
+
     // 主菜单
     Menu_AddItem(main_menu, "Info", MENU_ITEM_REALTIME_PARAMS, NULL, NULL);
+    Menu_AddItem(main_menu, "Test", MENU_ITEM_SUBMENU,test_menu,NULL);
     Menu_AddItem(main_menu, "Flash", MENU_ITEM_SUBMENU,flash_menu,NULL);
     Menu_AddItem(main_menu, "Go Car!", MENU_ITEM_SUBMENU,go_menu,NULL);
     Menu_AddItem(main_menu, "Reset", MENU_ITEM_ACTION, NULL, NULL);
+
+    //测试菜单
+    Menu_AddItem(test_menu, "Motor Test", MENU_ITEM_SUBMENU,motor_test_menu,NULL);
+    Menu_AddItem(test_menu, "OLED Test", MENU_ITEM_ACTION,NULL,OLED_Test);
 
     //Flash菜单
     Menu_AddItem(flash_menu, "R Flash", MENU_ITEM_ACTION,NULL,NULL);
@@ -190,6 +199,13 @@ void Menu_Init(void)
     Menu_AddItem(go_menu, "Mode 4",MENU_ITEM_ACTION,NULL,NULL);
     Menu_AddItem(go_menu, "Mode 5",MENU_ITEM_ACTION,NULL,NULL);
     
+    //Motor Test子菜单
+    Menu_AddItem(motor_test_menu, "Motor STOP", MENU_ITEM_SUBMENU,NULL,motor_stop);
+    Menu_AddItem(motor_test_menu, "100",MENU_ITEM_ACTION,NULL,motor_test_100_100);
+    Menu_AddItem(motor_test_menu,"-100",MENU_ITEM_ACTION,NULL,motor_test_neg100_neg100);
+    Menu_AddItem(motor_test_menu, "50",MENU_ITEM_ACTION,NULL,motor_test_50_50);
+    Menu_AddItem(motor_test_menu, "-50",MENU_ITEM_ACTION,NULL,motor_test_neg50_neg50);
+
     current_menu = main_menu;
     need_refresh = 1;
     

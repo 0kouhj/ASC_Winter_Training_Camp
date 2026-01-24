@@ -37,7 +37,10 @@ typedef struct {
     // 动力系统状态
     int32_t encoder_left;   // 左电机总脉冲
     int32_t encoder_right;  // 右电机总脉冲
-    float velocity_now;     // 当前平滑后的速度
+    int16_t motor_target_speed_left;   // 左电机目标速度
+    int16_t motor_target_speed_right;  // 右电机目标速度
+    int16_t motor_actual_speed_left;   // 左电机实际速度
+    int16_t motor_actual_speed_right;  // 右电机实际速度
     float displacement;     // 当前累计位移
     
     // 电池与系统

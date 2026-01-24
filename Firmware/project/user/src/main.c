@@ -46,6 +46,7 @@
 #include "bsp_buzzer.h"
 #include "bsp_oled.h"
 #include "bsp_imu.h"
+#include "bsp_motor.h"
 
 #include "kalman.h"
 
@@ -59,7 +60,7 @@ void OLED_Start(void);
 // 函数声明
 
 // DEBUG
-int32_t debug_count = 0;
+
 // DEBUG
 
 int main(void)
@@ -72,6 +73,10 @@ int main(void)
     interrupt_set_priority(KEY_PRIORITY, 0);
     // TIM 与 Encoder
 
+    // 电机
+    motor_init();
+    // 电机
+
     // 此处编写用户代码 例如外设初始化代码等
     key_init(10);
     LED_Init();
@@ -79,13 +84,15 @@ int main(void)
     OLED_Init();
     Menu_Init();
     Attitude_Init();
-    
+
+    motor_set_left_speed(0);
+    motor_set_right_speed(0);
 
     // 此处编写用户代码 例如外设初始化代码等
 
     // 自检
     LED_On(ALL);
-    Buzzer_On();
+    //Buzzer_On();
     OLED_Start();
     if (ICM42688_I2C_Init() != 0) {
         OLED_Clear();
@@ -105,18 +112,20 @@ int main(void)
 
     OLED_Clear();
 
+    
+
     while(1)
     {
         // Debug
-        debug_count++;
-        //test_key();
 
-        //Debug
+        // test_key();
+
+        // Debug
         // 此处编写需要循环执行的代码
         Menu_Process();
         ICM42688_I2C_Read_Data(&Icm);
         Attitude_Update(0.01f);
-        // 此处编写需要循环执行的代码
+        motor_update();        // 此处编写需要循环执行的代码
         system_delay_ms(5);
     }
 }
