@@ -69,12 +69,10 @@ int main(void)
 {
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
     debug_init();                                                               // 初始化默认 Debug UART
-    
     // TIM 与 Encoder
     pit_ms_init(KEY_TIM,30);                                                    // 使用TIM6进行按键扫描
     interrupt_set_priority(KEY_PRIORITY, 0);
     // TIM 与 Encoder
-
     // 电机
     motor_init();
     encoder_init();
@@ -87,7 +85,7 @@ int main(void)
     battery_init();
     OLED_Init();
     Menu_Init();
-    Attitude_Init();    motor_set_left_speed(0);
+    Attitude_Init();
 
     // 此处编写用户代码 例如外设初始化代码等
 
@@ -113,7 +111,7 @@ int main(void)
 
     OLED_Clear();
 
-    
+
 
     while(1)
     {
@@ -122,13 +120,14 @@ int main(void)
         // test_key();
 
         // Debug
-        // 此处编写需要循环执行的代码
+                // 此处编写需要循环执行的代码
         Menu_Process();
         ICM42688_I2C_Read_Data(&Icm);
         Attitude_Update(0.01f);
         motor_update();
         State.battery_v = battery_get_voltage();        // 此处编写需要循环执行的代码
         system_delay_ms(5);
+
     }
 }
 // **************************** 代码区域 ****************************
