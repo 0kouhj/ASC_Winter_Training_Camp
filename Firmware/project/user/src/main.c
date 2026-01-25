@@ -46,6 +46,9 @@
 #include "bsp_buzzer.h"
 #include "bsp_oled.h"
 #include "bsp_imu.h"
+#include "bsp_motor.h"
+#include "bsp_encoder.h"
+#include "bsp_battery.h"
 
 #include "kalman.h"
 
@@ -59,33 +62,36 @@ void OLED_Start(void);
 // 函数声明
 
 // DEBUG
-int32_t debug_count = 0;
+
 // DEBUG
 
 int main(void)
 {
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
     debug_init();                                                               // 初始化默认 Debug UART
-    
     // TIM 与 Encoder
     pit_ms_init(KEY_TIM,30);                                                    // 使用TIM6进行按键扫描
     interrupt_set_priority(KEY_PRIORITY, 0);
     // TIM 与 Encoder
+    // 电机
+    motor_init();
+    encoder_init();
+    // 电机
 
     // 此处编写用户代码 例如外设初始化代码等
     key_init(10);
     LED_Init();
     Buzzer_Init();
+    battery_init();
     OLED_Init();
     Menu_Init();
     Attitude_Init();
-    
 
     // 此处编写用户代码 例如外设初始化代码等
 
     // 自检
     LED_On(ALL);
-    Buzzer_On();
+    //Buzzer_On();
     OLED_Start();
     if (ICM42688_I2C_Init() != 0) {
         OLED_Clear();
@@ -105,19 +111,23 @@ int main(void)
 
     OLED_Clear();
 
+
+
     while(1)
     {
         // Debug
-        debug_count++;
-        //test_key();
 
-        //Debug
-        // 此处编写需要循环执行的代码
+        // test_key();
+
+        // Debug
+                // 此处编写需要循环执行的代码
         Menu_Process();
         ICM42688_I2C_Read_Data(&Icm);
         Attitude_Update(0.01f);
-        // 此处编写需要循环执行的代码
+        motor_update();
+        State.battery_v = battery_get_voltage();        // 此处编写需要循环执行的代码
         system_delay_ms(5);
+
     }
 }
 // **************************** 代码区域 ****************************

@@ -1332,6 +1332,26 @@
               <FileType>5</FileType>
               <FilePath>..\code\bsp_oled.h</FilePath>
             </File>
+            <File>
+              <FileName>bsp_battery.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\bsp_battery.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_battery.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\bsp_battery.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\bsp_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_flash.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\bsp_flash.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -39,10 +39,16 @@ void State_Init(void) {
     State.gyro_y = 0.0f;
     State.encoder_left = 0;
     State.encoder_right = 0;
+    State.motor_target_speed_left = 0;
+    State.motor_target_speed_right = 0;
+    State.motor_actual_speed_left = 0;
+    State.motor_actual_speed_right = 0;
     State.is_stop = 1;      // 开机默认锁定电机，保护安全
     State.run_stage = 0;
     State.loop_count = 0;
     State.menu_index = 0;
+    State.battery_v = 0.0f;
+    State.system_tick = 0;
 }
 
 /**

@@ -1,5 +1,6 @@
 #include "menu.h"
 #include "bsp_oled.h"
+#include "bsp_motor.h"
 #include "zf_device_key.h"
 #include <string.h>
 #include <stdlib.h>
@@ -123,8 +124,6 @@ void Menu_DisplayRealtimeParams(void)
     
     // 提前声明所有局部变量
     char bat_str[16];
-    char ir_str[4];
-    char pid_str[8];
     char page_str[4];
     uint16_t volt_int, volt_frac;
     
@@ -134,33 +133,24 @@ void Menu_DisplayRealtimeParams(void)
         {
             // 电池状态
             OLED_ShowString(0, line*8, "Bat:", OLED_6X8);
-            //IntToStr(system_status_packet.battery_level, bat_str);
-            OLED_ShowString(24, line*8, bat_str, OLED_6X8);
-            // 显示电压（整数部分.小数部分）
-            //volt_int = (uint16_t)system_status_packet.battery_voltage;
-            //volt_frac = (uint16_t)((system_status_packet.battery_voltage - volt_int) * 100);
-            IntToStr(volt_int, bat_str);
-            OLED_ShowString(54, line*8, bat_str, OLED_6X8);
-            OLED_ShowString(66, line*8, ".", OLED_6X8);
-            IntToStr(volt_frac, bat_str);
-            OLED_ShowString(72, line*8, bat_str, OLED_6X8);
-            OLED_ShowString(78, line*8, "V)", OLED_6X8);
+            OLED_ShowFloatNum(30, line*8, State.battery_v, 2, 2, OLED_6X8);
+            OLED_ShowString(68, line*8, "V", OLED_6X8);
             line++;
             // 左电机目标速度
             OLED_ShowString(0, line*8, "L-Target:", OLED_6X8);
-            //OLED_ShowSignedNum(54, line*8,motor_speed_data.left_target_speed,3,OLED_6X8);
+            OLED_ShowSignedNum(60, line*8, State.motor_target_speed_left, 5, OLED_6X8);
             line++;
             // 左电机实际速度
             OLED_ShowString(0, line*8, "L-Actual:", OLED_6X8);
-            //OLED_ShowSignedNum(54, line*8,motor_speed_data.left_actual_speed,3,OLED_6X8);
+            OLED_ShowSignedNum(60, line*8, State.motor_actual_speed_left, 5, OLED_6X8);
             line++;
             // 右电机目标速度
             OLED_ShowString(0, line*8, "R-Target:", OLED_6X8);
-            //OLED_ShowSignedNum(54, line*8,motor_speed_data.right_target_speed,3,OLED_6X8);
+            OLED_ShowSignedNum(60, line*8, State.motor_target_speed_right, 5, OLED_6X8);
             line++;
             // 右电机实际速度
-            OLED_ShowString(0, line*8, "R-Target:", OLED_6X8);
-            //OLED_ShowSignedNum(54, line*8,motor_speed_data.right_actual_speed,3,OLED_6X8);
+            OLED_ShowString(0, line*8, "R-Actual:", OLED_6X8);
+            OLED_ShowSignedNum(60, line*8, State.motor_actual_speed_right, 5, OLED_6X8);
             line++;
             break;
         }
@@ -258,6 +248,19 @@ void Menu_DisplayRealtimeParams(void)
 					break;
 		}
 }
+            
+        case 3:  // 第4页：编码器数据
+        {
+            OLED_ShowString(0,line*8,"Left Encoder:",OLED_6X8);
+            OLED_ShowSignedNum(80,line*8,State.encoder_left,6,OLED_6X8);
+            line++;
+            OLED_ShowString(0,line*8,"Right Encoder:",OLED_6X8);
+            OLED_ShowSignedNum(80,line*8,State.encoder_right,6,OLED_6X8);
+            line++;
+            // 可以添加更多编码器相关信息，如果需要
+            break;
+		}
+    }
     
     // 显示页码指示器
     OLED_ShowString(104, 8, "P", OLED_6X8);
@@ -274,18 +277,29 @@ void Menu_Init(void)
 {
     // 创建菜单
     Menu *main_menu = Menu_Create("Main Menu");
+    Menu *test_menu = Menu_Create("Test Menu");
     Menu *flash_menu = Menu_Create("Flash Menu");
     Menu *go_menu = Menu_Create("Go!!!");
+
+    // Test子菜单
+    Menu *motor_test_menu = Menu_Create("Motor Test");
     
+
     // 主菜单
     Menu_AddItem(main_menu, "Info", MENU_ITEM_REALTIME_PARAMS, NULL, NULL);
+    Menu_AddItem(main_menu, "Test", MENU_ITEM_SUBMENU,test_menu,NULL);
     Menu_AddItem(main_menu, "Flash", MENU_ITEM_SUBMENU,flash_menu,NULL);
     Menu_AddItem(main_menu, "Go Car!", MENU_ITEM_SUBMENU,go_menu,NULL);
     Menu_AddItem(main_menu, "Reset", MENU_ITEM_ACTION, NULL, NULL);
 
+    //测试菜单
+    Menu_AddItem(test_menu, "Motor Test", MENU_ITEM_SUBMENU,motor_test_menu,NULL);
+    Menu_AddItem(test_menu, "OLED Test", MENU_ITEM_ACTION,NULL,OLED_Test);
+
     //Flash菜单
     Menu_AddItem(flash_menu, "R Flash", MENU_ITEM_ACTION,NULL,NULL);
     Menu_AddItem(flash_menu, "W Flash", MENU_ITEM_ACTION,NULL,NULL);
+    Menu_AddItem(flash_menu, "C Flash", MENU_ITEM_ACTION,NULL,NULL);
 	
     //发车菜单
     Menu_AddItem(go_menu, "Mode 1",MENU_ITEM_ACTION,NULL,NULL);
@@ -294,6 +308,13 @@ void Menu_Init(void)
     Menu_AddItem(go_menu, "Mode 4",MENU_ITEM_ACTION,NULL,NULL);
     Menu_AddItem(go_menu, "Mode 5",MENU_ITEM_ACTION,NULL,NULL);
     
+    //Motor Test子菜单
+    Menu_AddItem(motor_test_menu, "Motor STOP", MENU_ITEM_ACTION,NULL,motor_stop);
+    Menu_AddItem(motor_test_menu, "100",MENU_ITEM_ACTION,NULL,motor_test_100_100);
+    Menu_AddItem(motor_test_menu,"-100",MENU_ITEM_ACTION,NULL,motor_test_neg100_neg100);
+    Menu_AddItem(motor_test_menu, "50",MENU_ITEM_ACTION,NULL,motor_test_50_50);
+    Menu_AddItem(motor_test_menu, "-50",MENU_ITEM_ACTION,NULL,motor_test_neg50_neg50);
+
     current_menu = main_menu;
     need_refresh = 1;
     

@@ -2,25 +2,43 @@
 #define PIN_CONFIG_H
 
 //驱动定义
-#define LED_1           (H2)
-#define LED_2           (B8)
+#define BATTERY_ADC         (ADC2_CH14_C4)
 
-#define DOUBLE_KEY_1    (D3)
-#define DOUBLE_KEY_2    (D4)
+#define LED_1               (H2)
+#define LED_2               (B8)
 
-#define BUZZER          (D7)
+#define DOUBLE_KEY_1        (D3)
+#define DOUBLE_KEY_2        (D4)
 
-#define IMU_CS          (B12)
-#define IMU_SCLK        (B13)
-#define IMU_MOSI        (B14)
-#define IMU_MISO        (B15)
+#define BUZZER              (D7)
 
-#define OLED_SCL        (A7)
-#define OLED_SDA        (A5)
+#define IMU_CS              (B12)
+#define IMU_SCLK            (B13)
+#define IMU_MOSI            (B14)
+#define IMU_MISO            (B15)
+
+#define OLED_SCL            (A7)
+#define OLED_SDA            (A5)
+
+//电机
+#define PWM_CH1             (TIM5_PWM_CH1_A0)
+#define PWM_CH2             (TIM5_PWM_CH2_A1)
+
+#define ENCODER_LEFT_A      (TIM3_ENCODER_CH1_B4)
+#define ENCODER_LEFT_B      (TIM3_ENCODER_CH2_B5)
+
+#define ENCODER_RIGHT_A     (TIM4_ENCODER_CH1_B6)
+#define ENCODER_RIGHT_B     (TIM4_ENCODER_CH2_B7)
+
+#define Motor_L_DIR1        (A2)
+#define Motor_L_DIR2        (A3)
+
+#define Motor_R_DIR1        (D5)
+#define Motor_R_DIR2        (D6)
 
 //软件定义
 
-#define KEY_TIM         (TIM6_PIT)
-#define KEY_PRIORITY    (TIM6_IRQn)
+#define KEY_TIM             (TIM6_PIT)
+#define KEY_PRIORITY        (TIM6_IRQn)
 
 #endif

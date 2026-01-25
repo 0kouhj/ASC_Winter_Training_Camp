@@ -1205,3 +1205,17 @@ void OLED_DrawArc(int16_t X, int16_t Y, uint8_t Radius, int16_t StartAngle, int1
 }
 
 /*********************功能函数*/
+
+/*********************TEST */
+void OLED_Test(void)
+{
+	OLED_Clear();							//清屏
+	OLED_ShowString(0, 0, "OLED TEST", OLED_8X16);	//显示字符串
+	OLED_Update();					//更新显示
+	system_delay_ms(2000);				//延时2秒
+	
+	OLED_Clear();							//清屏
+	OLED_ShowImage(0, 0, 16, 16, Diode);	//显示图像
+	OLED_Update();					//更新显示
+	system_delay_ms(2000);						//延时2秒
+}
