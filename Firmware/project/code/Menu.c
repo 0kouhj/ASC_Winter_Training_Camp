@@ -7,6 +7,8 @@
 // 实时显示状态
 static RealtimeDisplayState realtime_state = {0};
 static uint8_t in_realtime_mode = 0;  // 是否处于实时显示模式
+static PIDEditState pid_edit_state = {0};
+static float original_kp, original_ki, original_kd;  // 保存原始值
 
 // 当前显示的菜单
 static Menu *current_menu = NULL;
@@ -18,7 +20,7 @@ static uint8_t warning_mode = 0;  // 是否处于警告模式
 // 显示配置
 #define DISPLAY_LINES 6           // 显示总行数
 #define MENU_ITEMS_PER_PAGE 5     // 每页显示的菜单项数量
-#define REAL_TIME_PAGE 3
+#define REAL_TIME_PAGE 4
 //辅助函数
 static void IntToStr(uint16_t num, char *str)
 {
@@ -41,6 +43,67 @@ static void IntToStr(uint16_t num, char *str)
     }
     str[j] = '\0';
 }
+
+// 增加PID编辑辅助函数
+static void PIDEdit_Init(void)
+{
+    pid_edit_state.is_editing = 0;
+    pid_edit_state.edit_item = 0;  // 默认编辑Kp
+    pid_edit_state.edit_step = 0.05f;
+    
+    // 根据我的实际变量修改
+     pid_edit_state.kp_ptr = &State.Kp;
+     pid_edit_state.ki_ptr = &State.Ki;
+     pid_edit_state.kd_ptr = &State.Kd;
+}
+
+static void PIDEdit_Start(void)
+{
+    // 保存原始值
+    if (pid_edit_state.kp_ptr) original_kp = *pid_edit_state.kp_ptr;
+    if (pid_edit_state.ki_ptr) original_ki = *pid_edit_state.ki_ptr;
+    if (pid_edit_state.kd_ptr) original_kd = *pid_edit_state.kd_ptr;
+    
+    pid_edit_state.is_editing = 1;
+    pid_edit_state.edit_item = 0;  // 从Kp开始
+}
+
+static void PIDEdit_Stop(uint8_t save_changes)
+{
+    if (!save_changes) {
+        // 恢复原始值
+        if (pid_edit_state.kp_ptr) *pid_edit_state.kp_ptr = original_kp;
+        if (pid_edit_state.ki_ptr) *pid_edit_state.ki_ptr = original_ki;
+        if (pid_edit_state.kd_ptr) *pid_edit_state.kd_ptr = original_kd;
+    }
+    
+    pid_edit_state.is_editing = 0;
+}
+
+static void PIDEdit_AdjustValue(float delta)
+{
+    float *target = NULL;
+    
+    switch(pid_edit_state.edit_item) {
+        case 0: target = pid_edit_state.kp_ptr; break;
+        case 1: target = pid_edit_state.ki_ptr; break;
+        case 2: target = pid_edit_state.kd_ptr; break;
+    }
+    
+    if (target) {
+        *target += delta * pid_edit_state.edit_step;
+        
+        // 限制范围（必要时开启）
+        // if (*target < 0.0f) *target = 0.0f;
+        // if (*target > 10.0f) *target = 10.0f;
+    }
+}
+
+static void PIDEdit_NextItem(void)
+{
+    pid_edit_state.edit_item = (pid_edit_state.edit_item + 1) % 3;
+}
+
 
 // 实时参数显示函数
 void Menu_DisplayRealtimeParams(void)
@@ -153,7 +216,48 @@ void Menu_DisplayRealtimeParams(void)
             OLED_ShowFloatNum(50,line*8,State.gyro_x,3,2,OLED_6X8);
             break;
 		}
-    }
+				case 3:  // 第4页：可调控PID参数
+				{
+					// 显示编辑模式提示
+					if (pid_edit_state.is_editing) {
+						OLED_ShowString(0, line*8, "EDIT MODE", OLED_6X8);
+						line++;
+					}
+				
+					// 显示Kp
+					OLED_ShowString(0, line*8, "Kp:", OLED_6X8);
+					if (pid_edit_state.is_editing && pid_edit_state.edit_item == 0) {
+							OLED_ShowString(20, line*8, ">", OLED_6X8);  // 编辑指示符
+					}
+					OLED_ShowFloatNum(50, line*8, State.Kp, 3, 2, OLED_6X8);
+					line++;
+					
+					// 显示Ki
+					OLED_ShowString(0, line*8, "Ki:", OLED_6X8);
+					if (pid_edit_state.is_editing && pid_edit_state.edit_item == 1) {
+							OLED_ShowString(20, line*8, ">", OLED_6X8);
+					}
+					OLED_ShowFloatNum(50, line*8, State.Ki, 3, 2, OLED_6X8);
+					line++;
+					
+					// 显示Kd
+					OLED_ShowString(0, line*8, "Kd:", OLED_6X8);
+					if (pid_edit_state.is_editing && pid_edit_state.edit_item == 2) {
+							OLED_ShowString(20, line*8, ">", OLED_6X8);
+					}
+					OLED_ShowFloatNum(50, line*8, State.Kd, 3, 2, OLED_6X8);
+					line++;
+					
+					// 显示操作提示
+					if (pid_edit_state.is_editing) {
+							OLED_ShowString(0, line*8, "KEY3:Next  KEY4:Cancel", OLED_6X8);
+					} else {
+							// 非编辑模式下显示进入编辑的提示
+							OLED_ShowString(0, line*8, "KEY3:Edit  KEY4:Back", OLED_6X8);
+					}
+					break;
+		}
+}
     
     // 显示页码指示器
     OLED_ShowString(104, 8, "P", OLED_6X8);
@@ -198,6 +302,9 @@ void Menu_Init(void)
     realtime_state.total_pages = REAL_TIME_PAGE;
     realtime_state.last_refresh = 0;
     in_realtime_mode = 0;
+		
+		//初始化PID编辑状态
+		PIDEdit_Init();
 }
 
 // 处理菜单逻辑（在主循环中调用）
@@ -206,29 +313,60 @@ void Menu_Process(void)
     
     if (current_menu == NULL) return;
     
-    // 检查是否处于实时参数显示模式
     if (in_realtime_mode) {
-        // 实时模式下的按键处理
-        if (key_get_state(KEY_1) == KEY_SHORT_PRESS) {
-            // 上键切换页面
-            if (realtime_state.current_page > 0) {
-                realtime_state.current_page--;
+        // 第四页，且处于编辑模式
+        if (realtime_state.current_page == 3 && pid_edit_state.is_editing) {
+            // 编辑模式下的按键处理
+            if (key_get_state(KEY_1) == KEY_SHORT_PRESS) {
+                // 上键增加数值 (+0.05)
+                PIDEdit_AdjustValue(1.0f);
             }
-        }
-        else if (key_get_state(KEY_2) == KEY_SHORT_PRESS) {
-            // 下键切换页面
-            if (realtime_state.current_page < realtime_state.total_pages - 1) {
-                realtime_state.current_page++;
+            else if (key_get_state(KEY_2) == KEY_SHORT_PRESS) {
+                // 下键减少数值 (-0.05)
+                PIDEdit_AdjustValue(-1.0f);
             }
-        }
-        else if (key_get_state(KEY_4) == KEY_SHORT_PRESS) {
-            in_realtime_mode = 0;
-            need_refresh = 1;
+            else if (key_get_state(KEY_3) == KEY_SHORT_PRESS) {
+                // 确认键切换到下一个编辑项
+                PIDEdit_NextItem();
+            }
+            else if (key_get_state(KEY_4) == KEY_SHORT_PRESS) {
+                // 取消键退出编辑模式（不保存）
+                PIDEdit_Stop(0);
+            }
+            // 编辑模式下刷新显示
+            Menu_DisplayRealtimeParams();
             return;
         }
-        Menu_DisplayRealtimeParams();
-        return;
+        else{
+            // 普通实时模式下的按键处理
+            if (key_get_state(KEY_1) == KEY_SHORT_PRESS) {
+                // 上键切换页面
+                if (realtime_state.current_page > 0) {
+                    realtime_state.current_page--;
+                }
+            }
+            else if (key_get_state(KEY_2) == KEY_SHORT_PRESS) {
+                // 下键切换页面
+                if (realtime_state.current_page < realtime_state.total_pages - 1) {
+                    realtime_state.current_page++;
+                }
+            }
+            else if (key_get_state(KEY_3) == KEY_SHORT_PRESS) {
+                // 确认键：在第四页进入编辑模式
+                if (realtime_state.current_page == 3) {
+                    PIDEdit_Start();
+                }
+            }
+            else if (key_get_state(KEY_4) == KEY_SHORT_PRESS) {
+                in_realtime_mode = 0;
+                need_refresh = 1;
+                return;
+            }
+            Menu_DisplayRealtimeParams();
+            return;
+        }
     }
+	
     
     // 检查按键事件
     if (key_get_state(KEY_1) == KEY_SHORT_PRESS) {
