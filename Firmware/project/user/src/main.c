@@ -47,6 +47,7 @@
 #include "bsp_oled.h"
 #include "bsp_imu.h"
 #include "bsp_motor.h"
+#include "bsp_encoder.h"
 #include "bsp_battery.h"
 
 #include "kalman.h"
@@ -76,6 +77,7 @@ int main(void)
 
     // 电机
     motor_init();
+    encoder_init();
     // 电机
 
     // 此处编写用户代码 例如外设初始化代码等

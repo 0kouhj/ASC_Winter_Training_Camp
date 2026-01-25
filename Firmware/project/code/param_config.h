@@ -35,8 +35,8 @@ typedef struct {
     uint8_t infrared[6];
     
     // 动力系统状态
-    int32_t encoder_left;   // 左电机总脉冲
-    int32_t encoder_right;  // 右电机总脉冲
+    int16_t encoder_left;   // 左电机总脉冲
+    int16_t encoder_right;  // 右电机总脉冲
     int16_t motor_target_speed_left;   // 左电机目标速度
     int16_t motor_target_speed_right;  // 右电机目标速度
     int16_t motor_actual_speed_left;   // 左电机实际速度

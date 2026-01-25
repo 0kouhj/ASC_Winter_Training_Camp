@@ -19,7 +19,7 @@ static uint8_t warning_mode = 0;  // 是否处于警告模式
 // 显示配置
 #define DISPLAY_LINES 6           // 显示总行数
 #define MENU_ITEMS_PER_PAGE 5     // 每页显示的菜单项数量
-#define REAL_TIME_PAGE 3
+#define REAL_TIME_PAGE 4
 //辅助函数
 static void IntToStr(uint16_t num, char *str)
 {
@@ -141,6 +141,18 @@ void Menu_DisplayRealtimeParams(void)
             line++;
             OLED_ShowString(0,line*8,"gyro_x:",OLED_6X8);
             OLED_ShowFloatNum(50,line*8,State.gyro_x,3,2,OLED_6X8);
+            break;
+		}
+            
+        case 3:  // 第4页：编码器数据
+        {
+            OLED_ShowString(0,line*8,"Left Encoder:",OLED_6X8);
+            OLED_ShowSignedNum(80,line*8,State.encoder_left,6,OLED_6X8);
+            line++;
+            OLED_ShowString(0,line*8,"Right Encoder:",OLED_6X8);
+            OLED_ShowSignedNum(80,line*8,State.encoder_right,6,OLED_6X8);
+            line++;
+            // 可以添加更多编码器相关信息，如果需要
             break;
 		}
     }
