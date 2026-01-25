@@ -12,7 +12,8 @@ typedef enum {
     MENU_ITEM_ACTION,
     MENU_ITEM_SUBMENU, 
     MENU_ITEM_BACK,
-    MENU_ITEM_REALTIME_PARAMS  // 新增：实时参数显示
+    MENU_ITEM_REALTIME_PARAMS,  // 实时参数显示
+		MENU_ITEM_VALUE_EDIT       // 新增：PID数据编辑项
 } MenuItemType;
 
 // 菜单项结构
@@ -50,6 +51,17 @@ typedef struct {
     uint8_t total_pages;      // 总页数
     uint32_t last_refresh;    // 上次刷新时间
 } RealtimeDisplayState;
+
+// 添加PID参数编辑状态结构体
+typedef struct {
+    uint8_t is_editing;      // 是否正在编辑
+    uint8_t edit_item;       // 当前编辑的项目(0:Kp, 1:Ki, 2:Kd)
+    float edit_step;         // 编辑步长
+    float *kp_ptr;           // Kp指针
+    float *ki_ptr;           // Ki指针
+    float *kd_ptr;           // Kd指针
+} PIDEditState;
+
 
 // 函数声明
 void Menu_Init(void);

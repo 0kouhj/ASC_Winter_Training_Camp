@@ -30,6 +30,9 @@ typedef struct {
     float gyro_x;           // X轴角速度 (前进方向)
     float gyro_y;           // Y轴角速度（平衡控制核心）
     float gyro_z;           // Z轴角速度
+		float Kp;
+		float Ki;
+		float Kd;
 
     // 红外传感器
     uint8_t infrared[6];
