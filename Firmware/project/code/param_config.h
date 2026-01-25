@@ -30,14 +30,20 @@ typedef struct {
     float gyro_x;           // X轴角速度 (前进方向)
     float gyro_y;           // Y轴角速度（平衡控制核心）
     float gyro_z;           // Z轴角速度
+		float Kp;
+		float Ki;
+		float Kd;
 
     // 红外传感器
     uint8_t infrared[6];
     
     // 动力系统状态
-    int32_t encoder_left;   // 左电机总脉冲
-    int32_t encoder_right;  // 右电机总脉冲
-    float velocity_now;     // 当前平滑后的速度
+    int16_t encoder_left;   // 左电机总脉冲
+    int16_t encoder_right;  // 右电机总脉冲
+    int16_t motor_target_speed_left;   // 左电机目标速度
+    int16_t motor_target_speed_right;  // 右电机目标速度
+    int16_t motor_actual_speed_left;   // 左电机实际速度
+    int16_t motor_actual_speed_right;  // 右电机实际速度
     float displacement;     // 当前累计位移
     
     // 电池与系统
