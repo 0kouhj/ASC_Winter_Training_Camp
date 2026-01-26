@@ -40,10 +40,10 @@ typedef struct {
     // 动力系统状态
     int16_t encoder_left;   // 左电机总脉冲
     int16_t encoder_right;  // 右电机总脉冲
-    float motor_target_speed_left;   // 左电机目标速度
-    float motor_target_speed_right;  // 右电机目标速度
-    float motor_actual_speed_left;   // 左电机实际速度
-    float motor_actual_speed_right;  // 右电机实际速度
+    int16_t motor_target_speed_left;   // 左电机目标速度
+    int16_t motor_target_speed_right;  // 右电机目标速度
+    int16_t motor_actual_speed_left;   // 左电机实际速度
+    int16_t motor_actual_speed_right;  // 右电机实际速度
     float displacement;     // 当前累计位移
     
     // 电池与系统
@@ -116,6 +116,13 @@ typedef struct {
 } STRUCT_MODE_4;
 
 typedef struct {
+    int motor_deadzone;
+    float battery_min;
+} STRUCT_HARDWARE;
+
+// Flash一键读写
+
+typedef struct {
     STRUCT_BOOT        boot;
     STRUCT_ANGLE_PID   angle;
     STRUCT_SPEED_PID   speed;
@@ -123,6 +130,7 @@ typedef struct {
     STRUCT_YAW_PID     yaw;
     STRUCT_PATH_MOTION path;
     STRUCT_MODE_4      mode4;
+    STRUCT_HARDWARE    hw;
     uint32_t           checksum; // 校验码，判断Flash数据是否合法
 } SYSTEM_CONFIG_T;
 
@@ -132,5 +140,7 @@ extern SYSTEM_STATE_T  State;
 extern ICM42688_t Icm;
 // 函数声明
 void Param_Init(void);
+void Param_SaveToFlash(void);
+void Param_ReadFromFlash(void);
 
 #endif
