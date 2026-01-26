@@ -22,3 +22,8 @@ float battery_get_voltage(void)
     float voltage = (adc_value / (float)(1 << ADC_RESOLUTION)) * ADC_REF_VOLTAGE / VOLTAGE_DIVIDER_RATIO / 1000.0f;
     return voltage;
 }
+
+void battery_update(void)
+{
+    State.battery_v = battery_get_voltage();
+}
