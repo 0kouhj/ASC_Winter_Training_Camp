@@ -1267,6 +1267,16 @@
               <FileType>5</FileType>
               <FilePath>..\code\Kalman.h</FilePath>
             </File>
+            <File>
+              <FileName>Simple_Timewheel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\Simple_Timewheel.c</FilePath>
+            </File>
+            <File>
+              <FileName>Simple_Timewheel.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\Simple_Timewheel.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

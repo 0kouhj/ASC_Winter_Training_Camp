@@ -38,7 +38,7 @@
 
 //软件定义
 
-#define KEY_TIM             (TIM6_PIT)
-#define KEY_PRIORITY        (TIM6_IRQn)
+#define TIME_TIM             (TIM6_PIT)
+#define TIME_PRIORITY        (TIM6_IRQn)
 
 #endif

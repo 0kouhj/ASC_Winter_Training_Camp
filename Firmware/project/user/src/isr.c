@@ -34,7 +34,9 @@
 ********************************************************************************************************************/
 
 #include "isr.h"
-#include "bsp_encoder.h"
+#include "Simple_Timewheel.h"
+
+extern volatile uint8_t tick_flag;
 
 //-------------------------------------------------------------------------------------------------------------------
 // 函数简介     TIM1 的定时器更新中断服务函数 启动 .s 文件定义 不允许修改函数名称
@@ -103,9 +105,7 @@ void TIM5_IRQHandler (void)
 void TIM6_IRQHandler (void)
 {
     // 此处编写用户代码
-    key_scanner();
-    State.encoder_left = encoder_get_left();
-    State.encoder_right = encoder_get_right();
+    tick_flag = 1;
     // 此处编写用户代码
     TIM6->SR &= ~TIM6->SR;                                                      // 清空中断状态
 }
