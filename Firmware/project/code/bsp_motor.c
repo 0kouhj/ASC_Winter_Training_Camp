@@ -60,6 +60,12 @@ void motor_test_neg100_neg100(void)
     State.motor_target_speed_right = -10000;
 }
 
+void motor_test_deadzone(void)
+{
+    State.motor_target_speed_left = 1000;
+    State.motor_target_speed_right = 1000;
+}
+
 void motor_set_speed(int16_t left_speed, int16_t right_speed)
 {
     State.motor_target_speed_left = left_speed;

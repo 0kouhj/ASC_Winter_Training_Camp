@@ -156,19 +156,23 @@ void Menu_DisplayRealtimeParams(void)
         line++;
         // 左电机目标速度
         OLED_ShowString(0, line * 8, "L-Target:", OLED_6X8);
-        OLED_ShowSignedNum(60, line * 8, State.motor_target_speed_left, 5, OLED_6X8);
+        OLED_ShowString(96, line * 8, "m/s", OLED_6X8);
+        OLED_ShowFloatNum(60, line * 8, State.motor_target_speed_left, 1, 2, OLED_6X8);
         line++;
         // 左电机实际速度
         OLED_ShowString(0, line * 8, "L-Actual:", OLED_6X8);
-        OLED_ShowSignedNum(60, line * 8, State.motor_actual_speed_left, 5, OLED_6X8);
+        OLED_ShowString(96, line * 8, "m/s", OLED_6X8);
+        OLED_ShowFloatNum(60, line * 8, State.motor_actual_speed_left, 1, 2, OLED_6X8);
         line++;
         // 右电机目标速度
         OLED_ShowString(0, line * 8, "R-Target:", OLED_6X8);
-        OLED_ShowSignedNum(60, line * 8, State.motor_target_speed_right, 5, OLED_6X8);
+        OLED_ShowString(96, line * 8, "m/s", OLED_6X8);
+        OLED_ShowFloatNum(60, line * 8, State.motor_target_speed_right, 1, 2, OLED_6X8);
         line++;
         // 右电机实际速度
         OLED_ShowString(0, line * 8, "R-Actual:", OLED_6X8);
-        OLED_ShowSignedNum(60, line * 8, State.motor_actual_speed_right, 5, OLED_6X8);
+        OLED_ShowString(96, line * 8, "m/s", OLED_6X8);
+        OLED_ShowFloatNum(60, line * 8, State.motor_actual_speed_right, 1, 2, OLED_6X8);
         line++;
         break;
     }
@@ -337,6 +341,7 @@ void Menu_Init(void)
     Menu_AddItem(motor_test_menu, "-100", MENU_ITEM_ACTION, NULL, motor_test_neg100_neg100);
     Menu_AddItem(motor_test_menu, "50", MENU_ITEM_ACTION, NULL, motor_test_50_50);
     Menu_AddItem(motor_test_menu, "-50", MENU_ITEM_ACTION, NULL, motor_test_neg50_neg50);
+    Menu_AddItem(motor_test_menu, "Deadzone Test", MENU_ITEM_ACTION, NULL, motor_test_deadzone);
 
     current_menu = main_menu;
     need_refresh = 1;

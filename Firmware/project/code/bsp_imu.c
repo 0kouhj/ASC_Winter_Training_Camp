@@ -110,6 +110,7 @@ void icm_i2c_read_regs(uint8 reg, uint8 *buf, uint8 len) {
 // --- 核心逻辑 ---
 
 uint8 ICM42688_I2C_Init(void) {
+
     gpio_init(ICM_SCL_PIN, GPO, 1, GPO_PUSH_PULL);
     gpio_init(ICM_SDA_PIN, GPO, 1, GPO_PUSH_PULL);
     

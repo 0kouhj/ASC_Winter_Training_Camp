@@ -1,14 +1,24 @@
 
 
+OpenDocument="ozone.jdebug", FilePath="D:/files/ASC/Winter_Camp/GIT_FILE/ozone.jdebug", Line=21
+OpenDocument="Menu.c", FilePath="d:/files/ASC/Winter_Camp/GIT_FILE/Firmware/project/code/Menu.c", Line=217
+OpenDocument="zf_driver_gpio.c", FilePath="D:/files/ASC/Winter_Camp/GIT_FILE/Firmware/libraries/zf_driver/zf_driver_gpio.c", Line=165
+OpenDocument="bsp_imu.c", FilePath="d:/files/ASC/Winter_Camp/GIT_FILE/Firmware/project/code/bsp_imu.c", Line=8
+OpenDocument="main.c", FilePath="d:/files/ASC/Winter_Camp/GIT_FILE/Firmware/project/USER/src/main.c", Line=80
+OpenDocument="zf_driver_encoder.c", FilePath="D:/files/ASC/Winter_Camp/GIT_FILE/Firmware/libraries/zf_driver/zf_driver_encoder.c", Line=80
+OpenDocument="bsp_encoder.c", FilePath="d:/files/ASC/Winter_Camp/GIT_FILE/Firmware/project/code/bsp_encoder.c", Line=1
+OpenDocument="bsp_motor.c", FilePath="d:/files/ASC/Winter_Camp/GIT_FILE/Firmware/project/code/bsp_motor.c", Line=62
+OpenDocument="Simple_Timewheel.c", FilePath="d:/files/ASC/Winter_Camp/GIT_FILE/Firmware/project/code/Simple_Timewheel.c", Line=1
+OpenDocument="Kalman.c", FilePath="d:/files/ASC/Winter_Camp/GIT_FILE/Firmware/project/code/Kalman.c", Line=72
 OpenDocument="zf_driver_delay.c", FilePath="D:/files/ASC/Winter_Camp/GIT_FILE/Firmware/libraries/zf_driver/zf_driver_delay.c", Line=51
 OpenDocument="isr.c", FilePath="d:/files/ASC/Winter_Camp/GIT_FILE/Firmware/project/user/src/isr.c", Line=104
 OpenDocument="Time_wheel.c", FilePath="D:/files/ASC/Winter_Camp/GIT_FILE/Firmware/project/code/Time_wheel.c", Line=45
-OpenDocument="ozone.jdebug", FilePath="D:/files/ASC/Winter_Camp/GIT_FILE/ozone.jdebug", Line=21
-OpenDocument="main.c", FilePath="d:/files/ASC/Winter_Camp/GIT_FILE/Firmware/project/USER/src/main.c", Line=58
+OpenDocument="startup_mm32f3277g.s", FilePath="D:/files/ASC/Winter_Camp/GIT_FILE/Firmware/libraries/sdk/mdk/startup_mm32f3277g.s", Line=132
+OpenDocument="zf_device_key.c", FilePath="d:/files/ASC/Winter_Camp/GIT_FILE/Firmware/libraries/zf_device/zf_device_key.c", Line=76
 OpenToolbar="Debug", Floating=0, x=0, y=0
-OpenWindow="Source Files", DockArea=LEFT, x=0, y=0, w=713, h=572, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Source Files", DockArea=LEFT, x=0, y=0, w=713, h=559, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
 OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=0, w=502, h=968, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
-OpenWindow="Watched Data 1", DockArea=LEFT, x=0, y=1, w=713, h=395, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
+OpenWindow="Watched Data 1", DockArea=LEFT, x=0, y=1, w=713, h=408, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
 OpenWindow="Data Sampling", DockArea=BOTTOM, x=1, y=0, w=982, h=443, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0, VisibleTab=0, UniformSampleSpacing=0
 OpenWindow="Timeline", DockArea=BOTTOM, x=2, y=0, w=686, h=443, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=1, DataPaneShown=1, PowerPaneShown=1, CodePaneShown=1, PinCursor="Cursor Movable", TimePerDiv="1 ns / Div", TimeStampFormat="Time", DataGraphDrawAsPoints=0, DataGraphLegendShown=1, DataGraphUniformSampleSpacing=0, DataGraphLegendPosition="418;-81", DataGraphShowNamesAtCursor=0, PowerGraphDrawAsPoints=0, PowerGraphLegendShown=1, PowerGraphAvgFilterTime=Off, PowerGraphAvgFilterLen=Off, PowerGraphUniformSampleSpacing=0, PowerGraphLegendPosition="418;-81", CodeGraphLegendShown=1, CodeGraphLegendPosition="350;220"
 OpenWindow="Console", DockArea=BOTTOM, x=0, y=0, w=890, h=443, FilterBarShown=0, TotalValueBarShown=0, ToolBarShown=0
@@ -22,3 +32,6 @@ TableHeader="RegisterSelectionDialog", SortCol="None", SortOrder="ASCENDING", Vi
 TableHeader="TargetExceptionDialog", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Address";"Description"], ColWidths=[27;27;27;44]
 WatchedExpression="debug_count", RefreshRate=5, Window=Watched Data 1
 WatchedExpression="tick_flag", RefreshRate=5, Window=Watched Data 1
+WatchedExpression="gyro_x", RefreshRate=1, Window=Watched Data 1
+WatchedExpression="encoder_left", RefreshRate=1, Window=Watched Data 1
+WatchedExpression="encoder_right", RefreshRate=1, Window=Watched Data 1

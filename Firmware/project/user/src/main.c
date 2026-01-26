@@ -55,11 +55,12 @@
 #include "Menu.h"
 
 #include "test.h"
+#include "param_config.h"
 #include "Simple_Timewheel.h"
 // *************************用户自定义包含****************************
 
 // 函数声明
-void OLED_Start(void);
+static void OLED_Start(void);
 // 函数声明
 
 // DEBUG
@@ -77,6 +78,11 @@ int main(void)
     pit_ms_init(TIME_TIM, 1); // 使用TIM6进行按键扫描
     interrupt_set_priority(TIME_PRIORITY, 0);
     // TIM 与 Encoder
+
+    // 数据初始化
+    Param_Init();
+    // 数据初始化
+
     // 电机
     motor_init();
     encoder_init();
@@ -95,7 +101,7 @@ int main(void)
 
     // 自检
     LED_On(ALL);
-    // Buzzer_On();
+    //Buzzer_On();
     OLED_Start();
     if (ICM42688_I2C_Init() != 0)
     {
@@ -119,11 +125,11 @@ int main(void)
 
     add_task(5, Attitude_Update);  // 每5ms更新姿态
     add_task(30, Menu_Process);    // 每30ms处理菜单
-    add_task(10, motor_update);    // 每10ms更新电机控制
+    add_task(5, motor_update);    // 每5ms更新电机控制
     add_task(100, battery_update); // 每100ms更新电池电压
     add_task(20, encoder_update);  // 每20ms更新编码器读取
     add_task(5, ICM_Update);       // 每5ms读取IMU数据
-    add_task(25, key_scanner);     // 每25ms按键扫描
+    add_task(30, key_scanner);     // 每25ms按键扫描
 
     while (1)
     {
