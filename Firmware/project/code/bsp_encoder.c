@@ -1,7 +1,6 @@
 #include "zf_common_headfile.h"
 #include "bsp_encoder.h"
 #include "pin_config.h"
-#include "Control.h"
 
 void encoder_init(void)
 {
@@ -12,22 +11,15 @@ void encoder_init(void)
     encoder_quad_init(TIM4_ENCODER, ENCODER_RIGHT_A, ENCODER_RIGHT_B);
 }
 
-void encoder_get_left(void)
+int16_t encoder_get_left(void)
 {
-    State.encoder_left = encoder_get_count(TIM3_ENCODER);
+    return encoder_get_count(TIM3_ENCODER);
     encoder_clear_count(TIM3_ENCODER);
+	
 }
 
-void encoder_get_right(void)
+int16_t encoder_get_right(void)
 {
-    State.encoder_right = encoder_get_count(TIM4_ENCODER);
+    return encoder_get_count(TIM4_ENCODER);
     encoder_clear_count(TIM4_ENCODER);
-}
-
-void encoder_update(void)
-{
-    encoder_get_left();
-    encoder_get_right();
-    State.motor_actual_speed_left = Motion_Get_Speed(State.encoder_left);
-    State.motor_actual_speed_right = Motion_Get_Speed(State.encoder_right);
 }

@@ -1,7 +1,6 @@
 #ifndef KALMAN_H
 #define KALMAN_H
 
-#define dt_for_ICM42688 (0.01f) // 采样周期 (秒)
 typedef struct {
     float Q_angle;   // 过程噪声协方差 (角度)
     float Q_bias;    // 过程噪声协方差 (偏差)
@@ -12,8 +11,8 @@ typedef struct {
 } Kalman_t;
 
 void Kalman_Init(Kalman_t *kalman);
-float Kalman_GetAngle(Kalman_t *kalman, float newAngle, float newRate);
+float Kalman_GetAngle(Kalman_t *kalman, float newAngle, float newRate, float dt);
 void Attitude_Init(void);
-void Attitude_Update(void);
+void Attitude_Update(float dt);
 
 #endif

@@ -110,7 +110,6 @@ void icm_i2c_read_regs(uint8 reg, uint8 *buf, uint8 len) {
 // --- 核心逻辑 ---
 
 uint8 ICM42688_I2C_Init(void) {
-
     gpio_init(ICM_SCL_PIN, GPO, 1, GPO_PUSH_PULL);
     gpio_init(ICM_SDA_PIN, GPO, 1, GPO_PUSH_PULL);
     
@@ -150,8 +149,4 @@ void ICM42688_I2C_Read_Data(ICM42688_t *dev) {
     dev->gyro_x_dps = (float)dev->gyro_x_raw / 16.4f;
     dev->gyro_y_dps = (float)dev->gyro_y_raw / 16.4f;
     dev->gyro_z_dps = (float)dev->gyro_z_raw / 16.4f;
-}
-
-void ICM_Update(void) {
-    ICM42688_I2C_Read_Data(&Icm);
 }
