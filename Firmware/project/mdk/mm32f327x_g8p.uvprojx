@@ -1362,6 +1362,16 @@
               <FileType>5</FileType>
               <FilePath>..\code\bsp_flash.h</FilePath>
             </File>
+            <File>
+              <FileName>bsp_bluetooth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\code\bsp_bluetooth.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_bluetooth.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\code\bsp_bluetooth.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

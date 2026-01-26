@@ -49,6 +49,7 @@
 #include "bsp_motor.h"
 #include "bsp_encoder.h"
 #include "bsp_battery.h"
+#include "bsp_bluetooth.h"
 
 #include "kalman.h"
 
@@ -96,6 +97,7 @@ int main(void)
     OLED_Init();
     Menu_Init();
     Attitude_Init();
+    bluetooth_init();
 
     // 此处编写用户代码 例如外设初始化代码等
 
@@ -130,6 +132,7 @@ int main(void)
     add_task(20, encoder_update);  // 每20ms更新编码器读取
     add_task(5, ICM_Update);       // 每5ms读取IMU数据
     add_task(30, key_scanner);     // 每25ms按键扫描
+    add_task(10, Bluetooth_Command_Process); // 每10ms处理蓝牙命令
 
     while (1)
     {
