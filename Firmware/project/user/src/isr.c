@@ -276,6 +276,8 @@ void UART6_IRQHandler (void)
     if(UART6->ISR & 0x00000002)                                                 // 串口接收缓冲中断
     {
         wireless_module_uart_handler();
+        extern void uart_rx_interrupt_handler(void);
+        uart_rx_interrupt_handler();
         // 此处编写用户代码
         // 务必读取数据或者关闭中断 否则会一直触发串口接收中断
 
