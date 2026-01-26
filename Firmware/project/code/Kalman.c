@@ -27,7 +27,7 @@ void Kalman_Init(Kalman_t *kalman) {
  * @param dt       采样周期 (秒)
  * @return 融合后的角度
  */
-float Kalman_GetAngle(Kalman_t *kalman, float newAngle, float newRate, float dt) {
+float Kalman_GetAngle(Kalman_t *kalman, float newAngle, float newRate) {
     // 1. 预测更新 (Prediction)
     // 根据上一时刻的角度和角速度预测当前角度
     float rate = newRate - kalman->bias;
@@ -86,7 +86,7 @@ void Attitude_Init(void) {
  * @brief 更新姿态解算，使用ICM42688数据
  * @param dt 时间间隔 (秒)
  */
-void Attitude_Update(float dt) {
+void Attitude_Update(void) {
     // 从Icm读取数据
     float ax = Icm.accel_x_g;
     float ay = Icm.accel_y_g;
@@ -100,8 +100,8 @@ void Attitude_Update(float dt) {
     float accel_roll = atan2f(ax, sqrtf(ay*ay + az*az)) * 180.0f / PI;
 
     // 使用卡尔曼滤波
-    State.pitch = Kalman_GetAngle(&kalman_pitch, accel_pitch, gx, dt);
-    State.roll = Kalman_GetAngle(&kalman_roll, accel_roll, gy, dt);
+    State.pitch = Kalman_GetAngle(&kalman_pitch, accel_pitch, gx);
+    State.roll = Kalman_GetAngle(&kalman_roll, accel_roll, gy);
 
     // Yaw 使用陀螺仪积分 (无磁力计)
     State.yaw += gz * dt * 180.0f / PI * 4.5; // 转换为度

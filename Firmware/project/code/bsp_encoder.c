@@ -11,14 +11,20 @@ void encoder_init(void)
     encoder_quad_init(TIM4_ENCODER, ENCODER_RIGHT_A, ENCODER_RIGHT_B);
 }
 
-int16_t encoder_get_left(void)
+void encoder_get_left(void)
 {
-    return encoder_get_count(TIM3_ENCODER);
+    State.encoder_left = encoder_get_count(TIM3_ENCODER);
     encoder_clear_count(TIM3_ENCODER);
 }
 
-int16_t encoder_get_right(void)
+void encoder_get_right(void)
 {
-    return encoder_get_count(TIM4_ENCODER);
+    State.encoder_right = encoder_get_count(TIM4_ENCODER);
     encoder_clear_count(TIM4_ENCODER);
+}
+
+void encoder_update(void)
+{
+    encoder_get_left();
+    encoder_get_right();
 }

@@ -150,3 +150,7 @@ void ICM42688_I2C_Read_Data(ICM42688_t *dev) {
     dev->gyro_y_dps = (float)dev->gyro_y_raw / 16.4f;
     dev->gyro_z_dps = (float)dev->gyro_z_raw / 16.4f;
 }
+
+void ICM_Update(void) {
+    ICM42688_I2C_Read_Data(&Icm);
+}

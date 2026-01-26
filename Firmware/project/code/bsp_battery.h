@@ -5,5 +5,5 @@
 
 void battery_init(void);
 float battery_get_voltage(void);
-
+void battery_update(void);
 #endif

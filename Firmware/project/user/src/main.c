@@ -55,6 +55,7 @@
 #include "Menu.h"
 
 #include "test.h"
+#include "Simple_Timewheel.h"
 // *************************用户自定义包含****************************
 
 // 函数声明
@@ -65,13 +66,16 @@ void OLED_Start(void);
 
 // DEBUG
 
+// Timewheel
+extern volatile uint8_t tick_flag; // 时间轮滴答标志
+// Timewheel
 int main(void)
 {
     clock_init(SYSTEM_CLOCK_120M);                                              // 初始化芯片时钟 工作频率为 120MHz
     debug_init();                                                               // 初始化默认 Debug UART
     // TIM 与 Encoder
-    pit_ms_init(KEY_TIM,30);                                                    // 使用TIM6进行按键扫描
-    interrupt_set_priority(KEY_PRIORITY, 0);
+    pit_ms_init(TIME_TIM,1);                                                    // 使用TIM6进行按键扫描
+    interrupt_set_priority(TIME_PRIORITY, 0);
     // TIM 与 Encoder
     // 电机
     motor_init();
@@ -111,23 +115,33 @@ int main(void)
 
     OLED_Clear();
 
+    add_task(5, Attitude_Update);   // 每5ms更新姿态
+    add_task(30, Menu_Process);     // 每30ms处理菜单
+    add_task(10, motor_update);     // 每10ms更新电机控制
+    add_task(100, battery_update);  // 每100ms更新电池电压
+    add_task(20, encoder_update);   // 每20ms更新编码器读取
+    add_task(5, ICM_Update);        // 每5ms读取IMU数据
+    add_task(25, key_scanner);      // 每25ms按键扫描
 
 
     while(1)
     {
         // Debug
-
+        OLED_Clear();
         // test_key();
 
         // Debug
                 // 此处编写需要循环执行的代码
-        Menu_Process();
-        ICM42688_I2C_Read_Data(&Icm);
-        Attitude_Update(0.01f);
-        motor_update();
-        State.battery_v = battery_get_voltage();        // 此处编写需要循环执行的代码
-        system_delay_ms(5);
-
+        // Menu_Process();
+        // ICM42688_I2C_Read_Data(&Icm);
+        // Attitude_Update(0.01f);
+        // motor_update();
+        // State.battery_v = battery_get_voltage();        // 此处编写需要循环执行的代码
+        // system_delay_ms(5);
+        if (tick_flag) {
+            time_wheel_run();
+            tick_flag = 0;
+    }
     }
 }
 // **************************** 代码区域 ****************************

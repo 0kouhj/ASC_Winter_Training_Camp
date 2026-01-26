@@ -21,7 +21,7 @@ static uint8_t warning_mode = 0;  // 是否处于警告模式
 // 显示配置
 #define DISPLAY_LINES 6           // 显示总行数
 #define MENU_ITEMS_PER_PAGE 5     // 每页显示的菜单项数量
-#define REAL_TIME_PAGE 4
+#define REAL_TIME_PAGE 5
 //辅助函数
 static void IntToStr(uint16_t num, char *str)
 {
@@ -247,9 +247,9 @@ void Menu_DisplayRealtimeParams(void)
 					}
 					break;
 		}
-}
+
             
-        case 3:  // 第4页：编码器数据
+        case 4:  // 第4页：编码器数据
         {
             OLED_ShowString(0,line*8,"Left Encoder:",OLED_6X8);
             OLED_ShowSignedNum(80,line*8,State.encoder_left,6,OLED_6X8);
