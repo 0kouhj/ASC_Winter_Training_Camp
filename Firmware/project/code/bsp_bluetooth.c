@@ -2,23 +2,19 @@
 
 // 创建缓冲区
 uint8_t bluetooth_rx_buffer[64];
-uint8_t bluetooth_tx_buffer[64];
 
 uint8_t fifo_rx_buffer[64];
-uint8_t fifo_tx_buffer[64];
 
 // 创建标质量
 uint8_t get_data = 0;
 uint32_t fifo_data_count = 0;
 
 fifo_struct fifo_rx;
-fifo_struct fifo_tx;
 
 void bluetooth_init(void)
 {
     // 蓝牙初始化代码
     fifo_init(&fifo_rx, FIFO_DATA_8BIT, fifo_rx_buffer, 64);
-    fifo_init(&fifo_tx, FIFO_DATA_8BIT, fifo_tx_buffer, 64);
 
     uart_init(BLUETOOTH_UART_INDEX,BLUETOOTH_BAUD,BLUETOOTH_TX,BLUETOOTH_RX);
     uart_rx_interrupt(BLUETOOTH_UART_INDEX,ZF_ENABLE);
