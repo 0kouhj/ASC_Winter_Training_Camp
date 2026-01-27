@@ -5,7 +5,6 @@
 // 电机PWM频率
 #define MOTOR_PWM_FREQ 17000
 
-
 void motor_init(void)
 {
     // 初始化左电机方向引脚
@@ -61,6 +60,12 @@ void motor_test_neg100_neg100(void)
     State.motor_target_speed_right = -10000;
 }
 
+void motor_test_deadzone(void)
+{
+    State.motor_target_speed_left = 1000;
+    State.motor_target_speed_right = 1000;
+}
+
 void motor_set_speed(int16_t left_speed, int16_t right_speed)
 {
     State.motor_target_speed_left = left_speed;
@@ -111,4 +116,3 @@ void motor_update(void)
         pwm_set_duty(PWM_CH2, 0);
     }
 }
-

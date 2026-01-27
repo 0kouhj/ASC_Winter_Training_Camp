@@ -1,4 +1,5 @@
 #include "zf_common_headfile.h"
+#include "bsp_motor.h"
 
 #define BT_RX_BUF_SIZE 64
 // 创建缓冲区
@@ -77,15 +78,42 @@ void Bluetooth_Command_Process(void)
             uart_write_string(BLUETOOTH_UART_INDEX, "[ACK JOYSTICK]\r\n");
         }
     }
-    else if (strcmp(cmd, "[STOP]") == 0)
+    else if (strcmp(cmd, "[stop]") == 0)
     {
-        // Emergency_Stop_Execute();
+        motor_stop();
         uart_write_string(BLUETOOTH_UART_INDEX, "[OK STOP]\r\n");
     }
-    else if (strcmp(cmd, "[STATUS]") == 0)
+    else if (sscanf(cmd, "[motor]") == 0)
     {
-        sprintf(response, "[STATUS BATT:95%% MODE:BT]\r\n");
+        int x,y;
+        if (sscanf(cmd, "[motor,%d,%d]", &x, &y) == 2)
+        {
+            switch (x)
+            {
+                case 0:
+                    motor_stop();
+                    break;
+                case 1:
+                    State.motor_target_speed_left = y;
+                    break;
+                case 2:
+                    State.motor_target_speed_right = y;
+                    break;
+                case 3:
+                    State.motor_target_speed_left = y;
+                    State.motor_target_speed_right = y;
+                    break;
+                default:
+                    break;
+            }   
+        }
+        sprintf(response, "[motor %d %d]\r\n", x, y);
         uart_write_string(BLUETOOTH_UART_INDEX, response);
+    }
+    else if (strcmp(cmd, "[reset]") == 0)
+    {
+        Param_Init();
+        uart_write_string(BLUETOOTH_UART_INDEX, "[OK RESET]\r\n");
     }
     else
     {
