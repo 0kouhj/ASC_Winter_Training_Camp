@@ -4,7 +4,7 @@
 #include "zf_common_headfile.h"
 
 // --- 轮式机器人参数 ---
-#define WHEEL_DIAMETER 0.068f
+#define WHEEL_DIAMETER 0.059f
 #define WHEEL_PERIMETER (PI * WHEEL_DIAMETER)
 
 // --- 编码器与减速比参数 ---
@@ -18,14 +18,26 @@
 #define MOTOR_MIN_PWM 1000.0f //死区pwm值，根据实际电机调试修改
 #define MOTOR_MAX_SPEED_MPS 2.5f // 对应原本的 MOTOR_MAX_SPEED
 
+// --- 速度环参数 ---
+#define VELOCITY_MAX_ANGLE_OFFSET 1.5f  // 速度环最大角度偏移 ±3°
+#define VELOCITY_INTEGRAL_LIMIT 2.0f    // 速度环积分限幅 ±2m/s²
+
 // --- 计算系数 ---
 // 脉冲转速度系数
 #define PULSE_TO_MPS_FACTOR (WHEEL_PERIMETER / (ENCODER_RESOLUTION * ENCODER_MULTI * GEAR_RATIO * SAMPLE_TIME_S))
 // 速度转PWM系数
 #define MPS_TO_PWM_FACTOR (MOTOR_MAX_PWM / MOTOR_MAX_SPEED_MPS)
 
+// --- 死区使用参数---
+#define MOTOR_DEADZONE_THRESHOLD 1200  // 电机死区阈值，根据实际测试调整
+#define OUTPUT_SMOOTHING_ALPHA 0.15f    // 输出平滑系数
+#define MIN_EFFECTIVE_PWM 50           // 最小有效PWM变化量
+
 // 函数声明
 float Motion_Get_Speed(int32_t pulse_count);
 int16_t Motion_Speed_To_PWM(float target_speed);
+void Control(void);
+extern float desired_angle;
+void minimal_test(void);
 
 #endif

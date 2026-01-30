@@ -60,6 +60,15 @@ typedef struct {
     uint8_t menu_level;     // 菜单层级
 } SYSTEM_STATE_T;
 
+typedef struct {
+    float speed_estimate;      // 估计的速度 (m/s)
+    float position_estimate;   // 估计的位置 (m)
+    float accel_bias;          // 加速度计零偏
+    float last_speed;          // 上次速度估计
+    int16_t last_pwm;          // 上次PWM输出
+    float last_update_time; // 上次更新时间
+} SpeedObserver;
+
 
 /*********以下为flash需要存储的函数*************/
 // 运行模式枚举

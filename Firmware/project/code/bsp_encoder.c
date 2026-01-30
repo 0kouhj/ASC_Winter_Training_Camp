@@ -2,6 +2,7 @@
 #include "bsp_encoder.h"
 #include "pin_config.h"
 #include "Control.h"
+#include "param_config.h"
 
 void encoder_init(void)
 {

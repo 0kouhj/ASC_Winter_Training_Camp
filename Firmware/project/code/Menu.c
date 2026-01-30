@@ -4,12 +4,15 @@
 #include "zf_device_key.h"
 #include <string.h>
 #include <stdlib.h>
+#include "param_config.h"
+#include "Control.h"
 
 // 实时显示状态
 static RealtimeDisplayState realtime_state = {0};
 static uint8_t in_realtime_mode = 0; // 是否处于实时显示模式
 static PIDEditState pid_edit_state = {0};
 static float original_kp, original_ki, original_kd; // 保存原始值
+float desired_angle;
 
 // 当前显示的菜单
 static Menu *current_menu = NULL;
@@ -277,17 +280,34 @@ void Menu_DisplayRealtimeParams(void)
         break;
     }
 
-    case 4: // 第4页：编码器数据
-    {
-        OLED_ShowString(0, line * 8, "Left Encoder:", OLED_6X8);
-        OLED_ShowSignedNum(80, line * 8, State.encoder_left, 6, OLED_6X8);
-        line++;
-        OLED_ShowString(0, line * 8, "Right Encoder:", OLED_6X8);
-        OLED_ShowSignedNum(80, line * 8, State.encoder_right, 6, OLED_6X8);
-        line++;
-        // 可以添加更多编码器相关信息，如果需要
-        break;
-    }
+    // Menu.c - 修改case 4部分
+			case 4: // 第4页：编码器数据
+			{
+					// 显示脉冲计数
+					OLED_ShowString(0, line * 8, "L-Pulse:", OLED_6X8);
+					OLED_ShowSignedNum(60, line * 8, State.encoder_left, 6, OLED_6X8);
+					line++;
+					
+					OLED_ShowString(0, line * 8, "R-Pulse:", OLED_6X8);
+					OLED_ShowSignedNum(60, line * 8, State.encoder_right, 6, OLED_6X8);
+					line++;
+					
+					// 显示速度（浮点数）
+					OLED_ShowString(0, line * 8, "L-Speed:", OLED_6X8);
+					OLED_ShowFloatNum(60, line * 8, desired_angle, 1, 3, OLED_6X8);
+					OLED_ShowString(100, line * 8, "m/s", OLED_6X8);
+					line++;
+					
+					OLED_ShowString(0, line * 8, "R-Speed:", OLED_6X8);
+					OLED_ShowFloatNum(60, line * 8, State.motor_actual_speed_right, 1, 3, OLED_6X8);
+					OLED_ShowString(100, line * 8, "m/s", OLED_6X8);
+					line++;
+					
+					// 显示原始值（用于调试）
+					OLED_ShowString(0, line * 8, "Debug:", OLED_6X8);
+					OLED_ShowString(40, line * 8, "Turn wheels!", OLED_6X8);
+					break;
+			}
     }
 
     // 显示页码指示器
