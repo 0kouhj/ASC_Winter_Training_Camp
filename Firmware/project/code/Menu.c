@@ -56,9 +56,9 @@ static void PIDEdit_Init(void)
     pid_edit_state.edit_step = 0.05f;
 
     // 根据我的实际变量修改
-    pid_edit_state.kp_ptr = &State.Kp;
-    pid_edit_state.ki_ptr = &State.Ki;
-    pid_edit_state.kd_ptr = &State.Kd;
+    pid_edit_state.kp_ptr = &Config.motor.Kp;
+    pid_edit_state.ki_ptr = &Config.motor.Ki;
+    pid_edit_state.kd_ptr = &Config.motor.Kd;
 }
 
 static void PIDEdit_Start(void)
@@ -243,7 +243,7 @@ void Menu_DisplayRealtimeParams(void)
         {
             OLED_ShowString(20, line * 8, ">", OLED_6X8); // 编辑指示符
         }
-        OLED_ShowFloatNum(50, line * 8, State.Kp, 3, 2, OLED_6X8);
+        OLED_ShowFloatNum(50, line * 8, Config.motor.Kp, 3, 2, OLED_6X8);
         line++;
 
         // 显示Ki
@@ -252,7 +252,7 @@ void Menu_DisplayRealtimeParams(void)
         {
             OLED_ShowString(20, line * 8, ">", OLED_6X8);
         }
-        OLED_ShowFloatNum(50, line * 8, State.Ki, 3, 2, OLED_6X8);
+        OLED_ShowFloatNum(50, line * 8, Config.motor.Ki, 3, 2, OLED_6X8);
         line++;
 
         // 显示Kd
@@ -261,7 +261,7 @@ void Menu_DisplayRealtimeParams(void)
         {
             OLED_ShowString(20, line * 8, ">", OLED_6X8);
         }
-        OLED_ShowFloatNum(50, line * 8, State.Kd, 3, 2, OLED_6X8);
+        OLED_ShowFloatNum(50, line * 8, Config.motor.Kd, 3, 2, OLED_6X8);
         line++;
 
         // 显示操作提示

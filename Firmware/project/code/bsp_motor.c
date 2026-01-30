@@ -1,6 +1,5 @@
 #include "zf_common_headfile.h"
 #include "bsp_motor.h"
-#include "pin_config.h"
 
 // 电机PWM频率
 #define MOTOR_PWM_FREQ 17000
@@ -10,11 +9,11 @@ void motor_init(void)
     // 初始化左电机方向引脚
     gpio_init(Motor_L_DIR1, GPO, GPIO_LOW, GPO_PUSH_PULL);
     gpio_init(Motor_L_DIR2, GPO, GPIO_LOW, GPO_PUSH_PULL);
-    
+
     // 初始化右电机方向引脚
     gpio_init(Motor_R_DIR1, GPO, GPIO_LOW, GPO_PUSH_PULL);
     gpio_init(Motor_R_DIR2, GPO, GPIO_LOW, GPO_PUSH_PULL);
-    
+
     // 初始化PWM
     pwm_init(PWM_CH1, MOTOR_PWM_FREQ, 0);
     pwm_init(PWM_CH2, MOTOR_PWM_FREQ, 0);
