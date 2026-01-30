@@ -60,53 +60,63 @@ void Param_Init(void)
 {
     State_Init();
     Icm42688_Init();
-    // 默认模式
+
+    // 1. 默认模式
     Config.boot.boot_mode = MODE_1;
 
-    // 姿态环默认值 (根据实际调试修改)
-    Config.angle.angle_kp = 0.0f;
+    // 2. 姿态环 (直立环)
+    Config.angle.angle_kp = 0.0f; // 需调试，单位: m/s per degree
     Config.angle.angle_kd = 0.0f;
-    Config.angle.mech_angle = 0.0f;
+    Config.angle.mech_angle = 0.0f; // 机械中值
 
-    // 速度环默认值
+    // 3. 速度环限幅修改 (外环输出是角度修正量)
     Config.speed.Kp = 0.0f;
     Config.speed.Ki = 0.0f;
     Config.speed.Kd = 0.0f;
     Config.speed.integral = 0.0f;
-    Config.speed.i_max = 0.0f;
+    Config.speed.i_max = 5.0f; // 积分限幅，防止大幅度漂移累积
     Config.speed.err_last = 0.0f;
-    Config.speed.out_max = 0.0f;
+    Config.speed.out_max = 10.0f; // 速度环最大允许倾斜角度补偿为 10度
 
-    // 电机环默认值
-    Config.motor.Kp = 0.0f;
-    Config.motor.Ki = 0.0f;
-    Config.motor.Kd = 0.0f;
-    Config.motor.integral = 0.0f;
-    Config.motor.i_max = 0.0f;
-    Config.motor.err_last = 0.0f;
-    Config.motor.out_max = 0.0f;
+    // 4. 电机环默认值 (内环：m/s 转换为 PWM 0-10000)
+    // 假设实测最大速度约 1.5m/s，则 Kp 建议从 2000 左右开始调试
+    Config.motor_l.Kp = 2000.0f;
+    Config.motor_l.Ki = 100.0f; // 适量积分消除稳态误差
+    Config.motor_l.Kd = 0.0f;
+    Config.motor_l.integral = 0.0f;
+    Config.motor_l.i_max = 5000.0f; // 积分限幅，设为输出上限的一半
+    Config.motor_l.err_last = 0.0f;
+    Config.motor_l.out_max = MOTOR_MAX_PWM; // 必须设为 10000.0f
 
-    // 位置环默认值
+    Config.motor_r.Kp = 2000.0f;
+    Config.motor_r.Ki = 100.0f;
+    Config.motor_r.Kd = 0.0f;
+    Config.motor_r.integral = 0.0f;
+    Config.motor_r.i_max = 5000.0f;
+    Config.motor_r.err_last = 0.0f;
+    Config.motor_r.out_max = MOTOR_MAX_PWM; // 必须设为 10000.0f
+
+    // 5. 位置环默认值 (可选)
     Config.position.Kp = 0.0f;
     Config.position.Ki = 0.0f;
     Config.position.Kd = 0.0f;
     Config.position.integral = 0.0f;
-    Config.position.i_max = 0.0f;
+    Config.position.i_max = 1.0f;
     Config.position.err_last = 0.0f;
-    Config.position.out_max = 0.0f;
+    Config.position.out_max = 0.5f; // 输出限幅通常设得很小，用于缓慢位置修正
 
-    // 转向环默认值
+    // 6. 转向环限幅修改
     Config.yaw.Kp = 0.0f;
     Config.yaw.Ki = 0.0f;
     Config.yaw.Kd = 0.0f;
     Config.yaw.integral = 0.0f;
-    Config.yaw.i_max = 0.0f;
+    Config.yaw.i_max = 0.5f; // 转向积分限幅 (m/s)
     Config.yaw.err_last = 0.0f;
-    Config.yaw.out_max = 0.0f;
+    Config.yaw.out_max = 1.0f; // 转向输出最大差速限制在 1.0m/s
 
-    // 运动参数
+    // 7. 运动参数
     Config.path.move_speed = 50;
     Config.path.target_dist_AB = 1000.0f;
 
-    Config.checksum = 0x12345678; // 用于标记Flash已被初始化
+    Config.checksum = 0x12345678;
 }

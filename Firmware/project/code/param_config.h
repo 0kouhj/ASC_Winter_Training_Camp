@@ -116,7 +116,8 @@ typedef struct
 {
     STRUCT_BOOT boot;
     STRUCT_ANGLE_PID angle;
-    STRUCT_PID motor;
+    STRUCT_PID motor_l;
+    STRUCT_PID motor_r;
     STRUCT_PID speed;
     STRUCT_PID position;
     STRUCT_PID yaw;

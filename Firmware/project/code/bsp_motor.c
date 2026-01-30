@@ -1,8 +1,6 @@
 #include "zf_common_headfile.h"
 #include "bsp_motor.h"
-
-// 电机PWM频率
-#define MOTOR_PWM_FREQ 17000
+#include "Control.h"
 
 void motor_init(void)
 {
@@ -71,47 +69,46 @@ void motor_set_speed(int16_t left_speed, int16_t right_speed)
     State.motor_target_speed_right = right_speed;
 }
 
+/**
+ * @brief 电机控制更新（闭环速度控制）
+ * @note  5ms调用一次
+ */
 void motor_update(void)
 {
-    // 左电机
-    if (State.motor_target_speed_left > 0)
+    // 1. 计算左电机 PID 输出
+    // error = 目标速度 (m/s) - 实际速度 (m/s)
+    float error_l = State.motor_target_speed_left - State.motor_actual_speed_left;
+    float pwm_out_l = PID_Compute(&Config.motor_l, error_l);
+
+    // 2. 计算右电机 PID 输出
+    float error_r = State.motor_target_speed_right - State.motor_actual_speed_right;
+    float pwm_out_r = PID_Compute(&Config.motor_r, error_r);
+
+    // 3. 执行左电机硬件输出
+    if (pwm_out_l > 0)
     {
-        // 前进
         gpio_set_level(Motor_L_DIR1, 0);
         gpio_set_level(Motor_L_DIR2, 1);
-        pwm_set_duty(PWM_CH1, State.motor_target_speed_left);
+        pwm_set_duty(PWM_CH1, (uint32)pwm_out_l);
     }
-    else if (State.motor_target_speed_left < 0)
+    else
     {
-        // 后退
         gpio_set_level(Motor_L_DIR1, 1);
         gpio_set_level(Motor_L_DIR2, 0);
-        pwm_set_duty(PWM_CH1, -State.motor_target_speed_left);
-    }
-    else
-    {
-        // 停止
-        pwm_set_duty(PWM_CH1, 0);
+        pwm_set_duty(PWM_CH1, (uint32)-pwm_out_l);
     }
 
-    // 右电机
-    if (State.motor_target_speed_right > 0)
+    // 4. 执行右电机硬件输出
+    if (pwm_out_r > 0)
     {
-        // 前进
         gpio_set_level(Motor_R_DIR1, 1);
         gpio_set_level(Motor_R_DIR2, 0);
-        pwm_set_duty(PWM_CH2, State.motor_target_speed_right);
-    }
-    else if (State.motor_target_speed_right < 0)
-    {
-        // 后退
-        gpio_set_level(Motor_R_DIR1, 0);
-        gpio_set_level(Motor_R_DIR2, 1);
-        pwm_set_duty(PWM_CH2, -State.motor_target_speed_right);
+        pwm_set_duty(PWM_CH2, (uint32)pwm_out_r);
     }
     else
     {
-        // 停止
-        pwm_set_duty(PWM_CH2, 0);
+        gpio_set_level(Motor_R_DIR1, 0);
+        gpio_set_level(Motor_R_DIR2, 1);
+        pwm_set_duty(PWM_CH2, (uint32)-pwm_out_r);
     }
 }
