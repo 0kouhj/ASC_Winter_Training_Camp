@@ -57,13 +57,9 @@ int16_t Motion_Speed_To_PWM(float target_speed)
  */
 float PID_Compute(STRUCT_PID *pid, float error)
 {
-    // 1. 比例项 P
     float p_out = pid->Kp * error;
 
-    // 2. 积分项 I (使用你定义的成员名，这里假设是 integral 和 i_max)
     pid->integral += error;
-
-    // 积分限幅
     if (pid->integral > pid->i_max)
         pid->integral = pid->i_max;
     if (pid->integral < -pid->i_max)
@@ -71,18 +67,44 @@ float PID_Compute(STRUCT_PID *pid, float error)
 
     float i_out = pid->Ki * pid->integral;
 
-    // 3. 微分项 D (假设成员名是 err_last)
     float d_out = pid->Kd * (error - pid->err_last);
     pid->err_last = error;
 
-    // 4. 总输出限幅 (假设成员名是 out_max)
-    float output = p_out + i_out + d_out;
-    if (output > pid->out_max)
-        output = pid->out_max;
-    if (output < -pid->out_max)
-        output = -pid->out_max;
+    float out = p_out + i_out + d_out;
 
-    return output;
+    if (out > pid->out_max)
+        out = pid->out_max;
+    if (out < -pid->out_max)
+        out = -pid->out_max;
+
+    return out;
+}
+
+float PID_Simple(STRUCT_PID *pid, float target, float actual)
+{
+    float error = target - actual;
+
+    // P
+    float p_out = pid->Kp * error;
+
+    // I
+    pid->integral += error;
+    if (pid->integral > pid->i_max)
+        pid->integral = pid->i_max;
+    if (pid->integral < -pid->i_max)
+        pid->integral = -pid->i_max;
+
+    float i_out = pid->Ki * pid->integral;
+
+    // 输出
+    float out = p_out + i_out;
+
+    if (out > pid->out_max)
+        out = pid->out_max;
+    if (out < -pid->out_max)
+        out = -pid->out_max;
+
+    return out;
 }
 
 /**

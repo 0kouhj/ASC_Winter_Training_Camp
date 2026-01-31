@@ -24,7 +24,6 @@ void encoder_get_right(void)
     encoder_clear_count(TIM4_ENCODER);
 }
 
-#define SPEED_LIMIT_MPS 0.44f // 定义物理速度限幅值
 #define MAX_REASONABLE_PULSE 500 // 5ms内电机不可能超过500脉冲，超过即为毛刺
 
 void encoder_update(void)

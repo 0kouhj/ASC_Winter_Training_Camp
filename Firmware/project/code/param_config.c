@@ -44,7 +44,7 @@ static void State_Init(void)
     State.motor_target_speed_right = 0;
     State.motor_actual_speed_left = 0;
     State.motor_actual_speed_right = 0;
-    State.is_stop = 1; // 开机默认锁定电机，保护安全
+    State.is_stop = 0; // 开机默认锁定电机，保护安全
     State.run_stage = 0;
     State.loop_count = 0;
     State.menu_index = 0;
@@ -79,21 +79,20 @@ void Param_Init(void)
     Config.speed.out_max = 10.0f; // 速度环最大允许倾斜角度补偿为 10度
 
     // 4. 电机环默认值 (内环：m/s 转换为 PWM 0-10000)
-    // 假设实测最大速度约 1.5m/s，则 Kp 建议从 2000 左右开始调试
-    Config.motor_l.Kp = 25000.0f;
-    Config.motor_l.Ki = 1200.0f; // 适量积分消除稳态误差
-    Config.motor_l.Kd = 0.0f;
+    Config.motor_l.Kp = 50000.0f;
+    Config.motor_l.Ki = 4000.0f; // 适量积分消除稳态误差
+    Config.motor_l.Kd = 10000.0f;
     Config.motor_l.integral = 0.0f;
-    Config.motor_l.i_max = 5000.0f; // 积分限幅，设为输出上限的一半
-    Config.motor_l.err_last = 0.0f;
+    Config.motor_l.i_max = 2000.0f; // 积分限幅，设为输出上限的一半
+    Config.motor_l.err_last = 3000.0f;
     Config.motor_l.out_max = MOTOR_MAX_PWM; // 必须设为 10000.0f
 
-    Config.motor_r.Kp = 25000.0f;
-    Config.motor_r.Ki = 1200.0f;
+    Config.motor_r.Kp = 15000.0f;
+    Config.motor_r.Ki = 800.0f;
     Config.motor_r.Kd = 0.0f;
     Config.motor_r.integral = 0.0f;
-    Config.motor_r.i_max = 5000.0f;
-    Config.motor_r.err_last = 0.0f;
+    Config.motor_r.i_max = 2000.0f;
+    Config.motor_r.err_last = 3000.0f;
     Config.motor_r.out_max = MOTOR_MAX_PWM; // 必须设为 10000.0f
 
     // 5. 位置环默认值 (可选)
