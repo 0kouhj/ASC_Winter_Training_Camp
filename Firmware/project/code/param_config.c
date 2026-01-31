@@ -1,5 +1,5 @@
 #include "param_config.h"
-
+#include "Control.h"
 // 实例化全局变量
 SYSTEM_CONFIG_T Config;
 SYSTEM_STATE_T State;
@@ -80,16 +80,16 @@ void Param_Init(void)
 
     // 4. 电机环默认值 (内环：m/s 转换为 PWM 0-10000)
     // 假设实测最大速度约 1.5m/s，则 Kp 建议从 2000 左右开始调试
-    Config.motor_l.Kp = 2000.0f;
-    Config.motor_l.Ki = 100.0f; // 适量积分消除稳态误差
+    Config.motor_l.Kp = 25000.0f;
+    Config.motor_l.Ki = 1200.0f; // 适量积分消除稳态误差
     Config.motor_l.Kd = 0.0f;
     Config.motor_l.integral = 0.0f;
     Config.motor_l.i_max = 5000.0f; // 积分限幅，设为输出上限的一半
     Config.motor_l.err_last = 0.0f;
     Config.motor_l.out_max = MOTOR_MAX_PWM; // 必须设为 10000.0f
 
-    Config.motor_r.Kp = 2000.0f;
-    Config.motor_r.Ki = 100.0f;
+    Config.motor_r.Kp = 25000.0f;
+    Config.motor_r.Ki = 1200.0f;
     Config.motor_r.Kd = 0.0f;
     Config.motor_r.integral = 0.0f;
     Config.motor_r.i_max = 5000.0f;

@@ -34,6 +34,7 @@
  ********************************************************************************************************************/
 
 #include "zf_common_headfile.h"
+#include "zf_common_debug.h"
 // 打开新的工程或者工程移动了位置务必执行以下操作
 // 第一步 关闭上面所有打开的文件
 // 第二步 project->clean  等待下方进度条走完
@@ -54,6 +55,7 @@
 #include "kalman.h"
 
 #include "Menu.h"
+#include "Control.h"    
 
 #include "test.h"
 #include "param_config.h"
@@ -65,7 +67,7 @@ static void OLED_Start(void);
 // 函数声明
 
 // DEBUG
-
+char line_str[]  = "*  DEBUG MODE ON  *\r\n";
 // DEBUG
 
 // Timewheel
@@ -75,6 +77,7 @@ int main(void)
 {
     clock_init(SYSTEM_CLOCK_120M); // 初始化芯片时钟 工作频率为 120MHz
     debug_init();                  // 初始化默认 Debug UART
+    
     // TIM 与 Encoder
     pit_ms_init(TIME_TIM, 1); // 使用TIM6进行按键扫描
     interrupt_set_priority(TIME_PRIORITY, 0);
@@ -125,12 +128,9 @@ int main(void)
 
     OLED_Clear();
 
-    add_task(5, Attitude_Update);  // 每5ms更新姿态
+    add_task(5, All_Update);  // 每5ms更新所有控制相关任务
     add_task(30, Menu_Process);    // 每30ms处理菜单
-    add_task(5, motor_update);    // 每5ms更新电机控制
     add_task(100, battery_update); // 每100ms更新电池电压
-    add_task(20, encoder_update);  // 每20ms更新编码器读取
-    add_task(5, ICM_Update);       // 每5ms读取IMU数据
     add_task(30, key_scanner);     // 每25ms按键扫描
     add_task(10, Bluetooth_Command_Process); // 每10ms处理蓝牙命令
 

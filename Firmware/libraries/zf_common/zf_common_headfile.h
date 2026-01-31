@@ -36,6 +36,8 @@
 #ifndef _zf_common_headfile_h_
 #define _zf_common_headfile_h_
 
+#define DEBUG 1
+
 #include "stdio.h"
 #include "stdint.h"
 #include "string.h"

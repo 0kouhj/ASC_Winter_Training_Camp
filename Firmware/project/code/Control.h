@@ -16,8 +16,10 @@
 // --- 电机硬件参数 ---
 #define MOTOR_MAX_PWM 10000.0f
 #define MOTOR_MIN_PWM 1000.0f    // 死区pwm值，根据实际电机调试修改
-#define MOTOR_MAX_SPEED_MPS 1.0f // 对应原本的 MOTOR_MAX_SPEED
+#define MOTOR_MAX_SPEED_MPS 0.4f // 对应原本的 MOTOR_MAX_SPEED
 #define MOTOR_PWM_FREQ 17000     // 电机PWM频率
+
+#define SPEED_LIMIT_MPS 0.44f // 定义物理速度限幅值
 
 // --- 计算系数 ---
 // 脉冲转速度系数
@@ -30,5 +32,5 @@ float Motion_Get_Speed(int32_t pulse_count);
 int16_t Motion_Speed_To_PWM(float target_speed);
 void Balance_Control_Loop_5ms(void);
 float PID_Compute(STRUCT_PID *pid, float error);
-
+void All_Update(void);
 #endif

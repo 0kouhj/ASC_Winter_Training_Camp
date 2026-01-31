@@ -86,7 +86,7 @@ void Bluetooth_Command_Process(void)
     else if (sscanf(cmd, "[motor]") == 0)
     {
         int x,y;
-        if (sscanf(cmd, "[motor,%d,%d]", &x, &y) == 2)
+        if (sscanf(cmd, "[motor %d %d]", &x, &y) == 2)
         {
             switch (x)
             {

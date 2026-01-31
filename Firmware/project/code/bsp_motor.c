@@ -29,32 +29,35 @@ void motor_set_right_speed(int16 speed)
 
 void motor_stop(void)
 {
-    State.motor_target_speed_left = 0;
-    State.motor_target_speed_right = 0;
+    State.is_stop = 1;
+    Config.motor_l.integral = 0;
+    Config.motor_r.integral = 0;
+    pwm_set_duty(PWM_CH1, 0);
+    pwm_set_duty(PWM_CH2, 0);
 }
 
 void motor_test_50_50(void)
 {
-    State.motor_target_speed_left = 5000;
-    State.motor_target_speed_right = 5000;
+    State.motor_target_speed_left = MOTOR_MAX_SPEED_MPS / 2;
+    State.motor_target_speed_right = MOTOR_MAX_SPEED_MPS / 2;
 }
 
 void motor_test_neg50_neg50(void)
 {
-    State.motor_target_speed_left = -5000;
-    State.motor_target_speed_right = -5000;
+    State.motor_target_speed_left = -MOTOR_MAX_SPEED_MPS / 2;
+    State.motor_target_speed_right = -MOTOR_MAX_SPEED_MPS / 2;
 }
 
 void motor_test_100_100(void)
 {
-    State.motor_target_speed_left = 10000;
-    State.motor_target_speed_right = 10000;
+    State.motor_target_speed_left = MOTOR_MAX_SPEED_MPS;
+    State.motor_target_speed_right = MOTOR_MAX_SPEED_MPS;
 }
 
 void motor_test_neg100_neg100(void)
 {
-    State.motor_target_speed_left = -10000;
-    State.motor_target_speed_right = -10000;
+    State.motor_target_speed_left = -MOTOR_MAX_SPEED_MPS;
+    State.motor_target_speed_right = -MOTOR_MAX_SPEED_MPS;
 }
 
 void motor_test_deadzone(void)

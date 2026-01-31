@@ -1,6 +1,8 @@
 #include "Control.h"
 #include "zf_common_headfile.h"
-
+#include "bsp_imu.h"
+#include "bsp_encoder.h"
+#include "bsp_motor.h"
 /**
  * @brief 计算物理速度 (m/s)
  * @param pulse_count 当前采样周期内的脉冲增量
@@ -143,4 +145,19 @@ void Balance_Control_Loop_5ms(void)
         pwm_set_duty(PWM_CH1, 0);
         pwm_set_duty(PWM_CH2, 0);
     }
+}
+
+void All_Update(void)
+{
+    encoder_update();
+    ICM_Update();
+    Attitude_Update();
+    //Balance_Control_Loop_5ms();
+    motor_update();
+    #ifndef DEBUG
+    #else
+        char str[128];
+        sprintf(str, "%f,%f,%f,%f\n", State.motor_actual_speed_left, State.motor_actual_speed_right,State.motor_target_speed_left, State.motor_target_speed_right);
+        uart_write_string(DEBUG_UART_INDEX, str);
+    #endif
 }
