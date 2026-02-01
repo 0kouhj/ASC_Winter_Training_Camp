@@ -168,7 +168,7 @@ void All_Update(void)
     if (ms2_cnt >= 2)
     {
         ms2_cnt = 0;
-        //Balance_Control_Loop();
+        Balance_Control_Loop();
         Attitude_Update();
     }
     ICM_Update();
