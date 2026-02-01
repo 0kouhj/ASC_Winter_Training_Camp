@@ -172,13 +172,6 @@ uint8 ICM42688_I2C_Init(void)
     icm_i2c_write_reg(ICM42688_REG_GYRO_CONFIG0, 0x06);  // 2000dps, 1kHz
     icm_i2c_write_reg(ICM42688_REG_ACCEL_CONFIG0, 0x06); // 16g, 1kHz
 
-    // 开启硬件低通滤波
-    // 0x1A = 0001 1010
-    // Bit 4: UI_FILT_ORD 选择 2nd Order
-    // Bit 2-0: UI_FILT_BW 选择 BW=ODR/20 (约 50Hz)
-    icm_i2c_write_reg(0x51, 0x1A); // 配置陀螺仪滤波器
-    icm_i2c_write_reg(0x53, 0x1A); // 配置加速度计滤波器
-
     return 0;
 }
 

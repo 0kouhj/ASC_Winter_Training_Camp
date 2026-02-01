@@ -35,6 +35,8 @@
 
 #include "isr.h"
 #include "Simple_Timewheel.h"
+#include "bsp_motor.h"
+#include "bsp_encoder.h"
 
 extern volatile uint8_t tick_flag;
 
@@ -106,6 +108,8 @@ void TIM6_IRQHandler (void)
 {
     // 此处编写用户代码
     tick_flag = 1;
+    encoder_update();
+    motor_update();
     // 此处编写用户代码
     TIM6->SR &= ~TIM6->SR;                                                      // 清空中断状态
 }

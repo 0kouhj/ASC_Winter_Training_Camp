@@ -3,50 +3,37 @@
 #include "bsp_imu.h"
 #include "bsp_encoder.h"
 #include "bsp_motor.h"
+
 /**
- * @brief 计算物理速度 (m/s)
- * @param pulse_count 当前采样周期内的脉冲增量
+ * @brief 简化后的速度反馈（直接返回每毫秒脉冲数）
  */
-float Motion_Get_Speed(int32_t pulse_count)
+float Motion_Get_Speed_L(int32_t pulse_count)
 {
-    // 使用统一命名的宏 PULSE_TO_MPS_FACTOR
-    return (float)pulse_count * PULSE_TO_MPS_FACTOR;
+    static float filtered_pulses_l = 0.0f; // 必须使用独立的静态变量
+    const float alpha = 0.3f;              // 1ms下兼顾响应与平滑
+
+    // 根据实测值 200，设置 250 为物理极限限幅，超过即判定为干扰
+    if (pulse_count > 210)
+        pulse_count = 210;
+    if (pulse_count < -210)
+        pulse_count = -210;
+
+    filtered_pulses_l = alpha * (float)pulse_count + (1.0f - alpha) * filtered_pulses_l;
+    return filtered_pulses_l;
 }
 
-/**
- * @brief 将物理速度目标转换为电机 PWM 占空比
- * @param target_speed 目标速度 (m/s)
- */
-int16_t Motion_Speed_To_PWM(float target_speed)
+float Motion_Get_Speed_R(int32_t pulse_count)
 {
-    float pwm_out;
+    static float filtered_pulses_r = 0.0f; // 必须使用独立的静态变量
+    const float alpha = 0.3f;
 
-    // 1. 限幅：防止输入速度超过物理极限 MOTOR_MAX_SPEED_MPS
-    if (target_speed > MOTOR_MAX_SPEED_MPS)
-        target_speed = MOTOR_MAX_SPEED_MPS;
-    if (target_speed < -MOTOR_MAX_SPEED_MPS)
-        target_speed = -MOTOR_MAX_SPEED_MPS;
+    if (pulse_count > 210)
+        pulse_count = 210;
+    if (pulse_count < -210)
+        pulse_count = -210;
 
-    // 2. 线性映射计算
-    pwm_out = target_speed * MPS_TO_PWM_FACTOR;
-
-    // 3. 死区补偿
-    if (pwm_out > 0.1f)
-    {
-        pwm_out += MOTOR_MIN_PWM;
-    }
-    else if (pwm_out < -0.1f)
-    {
-        pwm_out -= MOTOR_MIN_PWM;
-    }
-
-    // 4. 最终PWM限幅
-    if (pwm_out > MOTOR_MAX_PWM)
-        pwm_out = MOTOR_MAX_PWM;
-    if (pwm_out < -MOTOR_MAX_PWM)
-        pwm_out = -MOTOR_MAX_PWM;
-
-    return (int16_t)pwm_out;
+    filtered_pulses_r = alpha * (float)pulse_count + (1.0f - alpha) * filtered_pulses_r;
+    return filtered_pulses_r;
 }
 
 /**
@@ -111,7 +98,7 @@ float PID_Simple(STRUCT_PID *pid, float target, float actual)
  * @brief 平衡车核心控制循环 (5ms)
  * @note  所有输入数据（角度、角速度、速度）均由外部函数自动更新至 State 和 Icm 结构体
  */
-void Balance_Control_Loop_5ms(void)
+void Balance_Control_Loop(void)
 {
     static uint8 velocity_cnt = 0;
     static float speed_angle_offset = 0; // 速度环输出：期望角度补偿量
@@ -125,7 +112,7 @@ void Balance_Control_Loop_5ms(void)
 
     // --- 2. 速度环 (外环 - 每 20ms 执行一次) ---
     velocity_cnt++;
-    if (velocity_cnt >= 4)
+    if (velocity_cnt >= 10)
     {
         velocity_cnt = 0;
 
@@ -133,7 +120,7 @@ void Balance_Control_Loop_5ms(void)
         float speed_error = 0.0f - current_velocity;
 
         // 使用 Config 结构体中的 Speed_PID 进行计算
-        speed_angle_offset = PID_Compute(&Config.speed, speed_error);
+        speed_angle_offset = 0; // PID_Compute(&Config.speed, speed_error);
     }
 
     // --- 3. 直立环 (内环 - 每 5ms 执行一次) ---
@@ -151,7 +138,7 @@ void Balance_Control_Loop_5ms(void)
     float turn_error = State.motor_actual_speed_left - State.motor_actual_speed_right;
 
     // 使用 Config 结构体中的 Turn_PID
-    float turn_control_out = PID_Compute(&Config.yaw, turn_error);
+    float turn_control_out = 0; // PID_Compute(&Config.yaw, turn_error);
 
     // --- 5. 更新电机目标速度 ---
     // 将计算结果写入 State 结构体中的目标速度变量
@@ -166,20 +153,34 @@ void Balance_Control_Loop_5ms(void)
         State.is_stop = 1; // 停机保护
         pwm_set_duty(PWM_CH1, 0);
         pwm_set_duty(PWM_CH2, 0);
+        gpio_set_level(Motor_L_DIR1, 0);
+        gpio_set_level(Motor_L_DIR2, 1);
+        gpio_set_level(Motor_R_DIR1, 0);
+        gpio_set_level(Motor_R_DIR2, 1);
     }
 }
 
 void All_Update(void)
 {
-    encoder_update();
+    static uint8_t ms2_cnt = 0;
+    static uint8_t debug_cnt = 0;
+    ms2_cnt++;
+    if (ms2_cnt >= 2)
+    {
+        ms2_cnt = 0;
+        //Balance_Control_Loop();
+        Attitude_Update();
+    }
     ICM_Update();
-    Attitude_Update();
-    //Balance_Control_Loop_5ms();
-    motor_update();
-    #ifndef DEBUG
-    #else
-        char str[128];
-        sprintf(str, "%f,%f,%f,%f\n", State.motor_actual_speed_left, State.motor_actual_speed_right,State.motor_target_speed_left, State.motor_target_speed_right);
-        uart_write_string(DEBUG_UART_INDEX, str);
-    #endif
+    if (debug_cnt++ >= 10)
+    {
+        debug_cnt = 0;
+        #ifndef DEBUG
+        #else
+                char str[128];
+                // sprintf(str, "%f,%f,%f\n", State.pitch, State.roll, State.yaw);
+                sprintf(str, "%f,%f,%f,%f\n", State.motor_actual_speed_left, State.motor_actual_speed_right, State.motor_target_speed_left, State.motor_target_speed_right);
+                uart_write_string(DEBUG_UART_INDEX, str);
+        #endif
+    }
 }

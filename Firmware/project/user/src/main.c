@@ -77,7 +77,7 @@ int main(void)
 {
     clock_init(SYSTEM_CLOCK_120M); // 初始化芯片时钟 工作频率为 120MHz
     debug_init();                  // 初始化默认 Debug UART
-    
+
     // TIM 与 Encoder
     pit_ms_init(TIME_TIM, 1); // 使用TIM6进行按键扫描
     interrupt_set_priority(TIME_PRIORITY, 0);
@@ -128,7 +128,7 @@ int main(void)
 
     OLED_Clear();
 
-    add_task(5, All_Update);  // 每5ms更新所有控制相关任务
+    add_task(1, All_Update);  // 每5ms更新所有控制相关任务
     add_task(30, Menu_Process);    // 每30ms处理菜单
     add_task(100, battery_update); // 每100ms更新电池电压
     add_task(30, key_scanner);     // 每25ms按键扫描

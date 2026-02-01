@@ -12,16 +12,29 @@ void encoder_init(void)
     encoder_quad_init(TIM4_ENCODER, ENCODER_RIGHT_A, ENCODER_RIGHT_B);
 }
 
+/**
+ * @brief 获取左电机原始脉冲并清零
+ */
 void encoder_get_left(void)
 {
-    State.encoder_left = encoder_get_count(TIM3_ENCODER);
+    // 1. 获取原始脉冲计数（由定时器硬件计数器提供）
+    int32_t raw_count = (int32_t)encoder_get_count(TIM3_ENCODER);
     encoder_clear_count(TIM3_ENCODER);
+
+    // 2. 通过中间层函数进行“信号调理”（滤波、限幅）
+    // 这样 State 里的数据就是平滑的 float，PID 算起来才不会有毛刺
+    State.motor_actual_speed_left = Motion_Get_Speed_L(raw_count);
 }
 
+/**
+ * @brief 获取右电机原始脉冲并清零
+ */
 void encoder_get_right(void)
 {
-    State.encoder_right = encoder_get_count(TIM4_ENCODER);
+    int32_t raw_count = (int32_t)encoder_get_count(TIM4_ENCODER);
     encoder_clear_count(TIM4_ENCODER);
+
+    State.motor_actual_speed_right = Motion_Get_Speed_R(raw_count);
 }
 
 #define MAX_REASONABLE_PULSE 500 // 5ms内电机不可能超过500脉冲，超过即为毛刺
@@ -30,24 +43,4 @@ void encoder_update(void)
 {
     encoder_get_left();
     encoder_get_right();
-
-    // 1. 强制类型转换处理回绕
-    int16_t pulse_l = (int16_t)((uint16_t)State.encoder_left);
-    int16_t pulse_r = (int16_t)((uint16_t)State.encoder_right);
-
-    // 2. 核心补丁：剔除毛刺数据
-    // 如果脉冲数大得离谱（即你图中的绿线尖峰），直接丢弃本次采样，维持上次速度
-    if (abs(pulse_l) > MAX_REASONABLE_PULSE || abs(pulse_r) > MAX_REASONABLE_PULSE)
-    {
-        // 保持 motor_actual_speed 不变，不更新
-        return;
-    }
-
-    // 3. 计算物理速度并配合低通滤波
-    float speed_l = Motion_Get_Speed(pulse_l);
-    float speed_r = Motion_Get_Speed(pulse_r);
-
-    // 4. 限幅并平滑滤波
-    State.motor_actual_speed_left = State.motor_actual_speed_left * 0.8f + speed_l * 0.2f;
-    State.motor_actual_speed_right = State.motor_actual_speed_right * 0.8f + speed_r * 0.2f;
 }

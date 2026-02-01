@@ -11,15 +11,13 @@
 #define ENCODER_RESOLUTION 500.0f // 请根据实际线数修改
 #define ENCODER_MULTI 4.0f
 #define GEAR_RATIO 30.0f
-#define SAMPLE_TIME_S 0.005f // 采样周期，如果是10ms请改为0.01f
+#define SAMPLE_TIME_S 0.001f // 采样周期，如果是10ms请改为0.01f
 
 // --- 电机硬件参数 ---
 #define MOTOR_MAX_PWM 10000.0f
 #define MOTOR_MIN_PWM 1000.0f    // 死区pwm值，根据实际电机调试修改
-#define MOTOR_MAX_SPEED_MPS 0.34f // 对应原本的 MOTOR_MAX_SPEED
 #define MOTOR_PWM_FREQ 17000     // 电机PWM频率
-
-#define SPEED_LIMIT_MPS 0.34f // 定义物理速度限幅值
+#define MOTOR_MAX_SPEED 80.0f // 电机最大速度，根据实际调试修改
 
 // --- 计算系数 ---
 // 脉冲转速度系数
@@ -34,9 +32,9 @@
 #define SPEED_LOW_TH 0.20f     // m/s，低速区
 
 // 函数声明
-float Motion_Get_Speed(int32_t pulse_count);
-int16_t Motion_Speed_To_PWM(float target_speed);
-void Balance_Control_Loop_5ms(void);
+float Motion_Get_Speed_L(int32_t pulse_count);
+float Motion_Get_Speed_R(int32_t pulse_count);
+void Balance_Control_Loop(void);
 float PID_Compute(STRUCT_PID *pid, float error);
 float PID_Simple(STRUCT_PID *pid, float target, float actual);
 void All_Update(void);

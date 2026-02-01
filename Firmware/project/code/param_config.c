@@ -38,8 +38,6 @@ static void State_Init(void)
     State.yaw = 0.0f;
     State.gyro_x = 0.0f;
     State.gyro_y = 0.0f;
-    State.encoder_left = 0;
-    State.encoder_right = 0;
     State.motor_target_speed_left = 0;
     State.motor_target_speed_right = 0;
     State.motor_actual_speed_left = 0;
@@ -65,9 +63,9 @@ void Param_Init(void)
     Config.boot.boot_mode = MODE_1;
 
     // 2. 姿态环 (直立环)
-    Config.angle.angle_kp = 0.0f; // 需调试，单位: m/s per degree
-    Config.angle.angle_kd = 0.0f;
-    Config.angle.mech_angle = 0.0f; // 机械中值
+    Config.angle.angle_kp = -0.008f; // 需调试，单位: m/s per degree
+    Config.angle.angle_kd = -0.00f;
+    Config.angle.mech_angle = 3.2f; // 机械中值
 
     // 3. 速度环限幅修改 (外环输出是角度修正量)
     Config.speed.Kp = 0.0f;
@@ -79,20 +77,20 @@ void Param_Init(void)
     Config.speed.out_max = 10.0f; // 速度环最大允许倾斜角度补偿为 10度
 
     // 4. 电机环默认值 (内环：m/s 转换为 PWM 0-10000)
-    Config.motor_l.Kp = 50000.0f;
-    Config.motor_l.Ki = 4000.0f; // 适量积分消除稳态误差
-    Config.motor_l.Kd = 10000.0f;
+    Config.motor_l.Kp = 50.0f;
+    Config.motor_l.Ki = 1.8f; // 适量积分消除稳态误差
+    Config.motor_l.Kd = 0.0f;
     Config.motor_l.integral = 0.0f;
-    Config.motor_l.i_max = 2000.0f; // 积分限幅，设为输出上限的一半
-    Config.motor_l.err_last = 3000.0f;
+    Config.motor_l.i_max = 99999.0f; // 积分限幅，设为输出上限的一半
+    Config.motor_l.err_last = 999999.0f;
     Config.motor_l.out_max = MOTOR_MAX_PWM; // 必须设为 10000.0f
 
-    Config.motor_r.Kp = 15000.0f;
-    Config.motor_r.Ki = 800.0f;
+    Config.motor_r.Kp = 50.0f;
+    Config.motor_r.Ki = 1.8f;
     Config.motor_r.Kd = 0.0f;
     Config.motor_r.integral = 0.0f;
-    Config.motor_r.i_max = 2000.0f;
-    Config.motor_r.err_last = 3000.0f;
+    Config.motor_r.i_max = 99999.0f;
+    Config.motor_r.err_last = 99999.0f;
     Config.motor_r.out_max = MOTOR_MAX_PWM; // 必须设为 10000.0f
 
     // 5. 位置环默认值 (可选)
