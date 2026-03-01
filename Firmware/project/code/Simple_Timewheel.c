@@ -3,7 +3,7 @@
 // 实际定义变量
 TimeWheel_Task task_list[MAX_TASKS] = {0}; 
 volatile uint8_t tick_flag = 0;
-
+volatile uint8_t tick_flag_2 = 0;
 void add_task(uint16_t ms, void (*f)(void)) {
     for(int i = 0; i < MAX_TASKS; i++) {
         if(task_list[i].func == NULL) {

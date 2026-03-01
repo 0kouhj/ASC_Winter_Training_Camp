@@ -12,6 +12,12 @@ void motor_init(void)
     gpio_init(Motor_R_DIR1, GPO, GPIO_LOW, GPO_PUSH_PULL);
     gpio_init(Motor_R_DIR2, GPO, GPIO_LOW, GPO_PUSH_PULL);
 
+    gpio_set_level(Motor_L_DIR1, 0);
+    gpio_set_level(Motor_L_DIR2, 1);
+
+    gpio_set_level(Motor_R_DIR1, 1);
+    gpio_set_level(Motor_R_DIR2, 0);
+    
     // 初始化PWM
     pwm_init(PWM_CH1, MOTOR_PWM_FREQ, 0);
     pwm_init(PWM_CH2, MOTOR_PWM_FREQ, 0);
@@ -57,14 +63,14 @@ void motor_test_100_100(void)
 
 void motor_test_neg100_neg100(void)
 {
-    State.motor_target_speed_left = -MOTOR_MAX_SPEED;
-    State.motor_target_speed_right = -MOTOR_MAX_SPEED;
+    State.motor_target_speed_left = -MOTOR_MAX_SPEED / 10;
+    State.motor_target_speed_right = -MOTOR_MAX_SPEED / 10;
 }
 
 void motor_test_deadzone(void)
 {
-    State.motor_target_speed_left = 20;
-    State.motor_target_speed_right = 20;
+    State.motor_target_speed_left = MOTOR_MIN_PWM;
+    State.motor_target_speed_right = MOTOR_MAX_PWM;
 }
 
 void motor_set_speed(int16_t left_speed, int16_t right_speed)
@@ -86,21 +92,9 @@ void motor_update(void)
         return;
     }
 
-    if (State.is_stop || (State.motor_target_speed_left == 0 && fabs(State.motor_actual_speed_left) < 1.0f))
-    {
-        motor_stop();
-        return;
-    }
-
-    if (State.is_stop || (State.motor_target_speed_right == 0 && fabs(State.motor_actual_speed_right) < 1.0f))
-    {
-        motor_stop();
-        return;
-    }
-
     /* ================= 左电机控制 ================= */
-    // 1. 调用 PID_Simple 计算基础输出
-    float pwm_l = PID_Simple(&Config.motor_l, State.motor_target_speed_left, State.motor_actual_speed_left);
+    // 1. 调用 PID_Compute 计算基础输出
+    float pwm_l = PID_Compute_Motor(&Config.motor_l, State.motor_target_speed_left, State.motor_actual_speed_left);
 
     // 2. 添加死区补偿 (MOTOR_MIN_PWM = 1000)
     // 只要 PID 觉得该动，我们就给它起步的保底力
@@ -131,7 +125,7 @@ void motor_update(void)
     }
 
     /* ================= 右电机控制 (完全对称) ================= */
-    float pwm_r = PID_Simple(&Config.motor_r, State.motor_target_speed_right, State.motor_actual_speed_right);
+    float pwm_r = PID_Compute_Motor(&Config.motor_r, State.motor_target_speed_right, State.motor_actual_speed_right);
 
     if (pwm_r > 0.1f)
         pwm_r += MOTOR_MIN_PWM;
@@ -145,7 +139,7 @@ void motor_update(void)
 
     if (pwm_r >= 0)
     {
-        gpio_set_level(Motor_R_DIR1, 1); // 注意：右电机方向通常与左边相反
+        gpio_set_level(Motor_R_DIR1, 1);
         gpio_set_level(Motor_R_DIR2, 0);
         pwm_set_duty(PWM_CH2, (uint32)pwm_r);
     }

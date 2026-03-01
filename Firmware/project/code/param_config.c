@@ -62,54 +62,58 @@ void Param_Init(void)
     // 1. 默认模式
     Config.boot.boot_mode = MODE_1;
 
-    // 2. 姿态环 (直立环)
-    Config.angle.angle_kp = -0.008f; // 需调试，单位: m/s per degree
-    Config.angle.angle_kd = -0.00f;
-    Config.angle.mech_angle = 3.2f; // 机械中值
-
-    // 3. 速度环限幅修改 (外环输出是角度修正量)
-    Config.speed.Kp = 0.0f;
-    Config.speed.Ki = 0.0f;
-    Config.speed.Kd = 0.0f;
-    Config.speed.integral = 0.0f;
-    Config.speed.i_max = 5.0f; // 积分限幅，防止大幅度漂移累积
-    Config.speed.err_last = 0.0f;
-    Config.speed.out_max = 10.0f; // 速度环最大允许倾斜角度补偿为 10度
-
-    // 4. 电机环默认值 (内环：m/s 转换为 PWM 0-10000)
-    Config.motor_l.Kp = 50.0f;
-    Config.motor_l.Ki = 1.8f; // 适量积分消除稳态误差
+    // 2. 电机环默认值
+    Config.motor_l.Kp = 40.0f;
+    Config.motor_l.Ki = 3.2f; // 适量积分消除稳态误差
     Config.motor_l.Kd = 0.0f;
     Config.motor_l.integral = 0.0f;
-    Config.motor_l.i_max = 99999.0f; // 积分限幅，设为输出上限的一半
-    Config.motor_l.err_last = 999999.0f;
+    Config.motor_l.i_max = 8000.0f; // 积分限幅，设为输出上限的一半
+    Config.motor_l.err_last = 0.0f;
     Config.motor_l.out_max = MOTOR_MAX_PWM; // 必须设为 10000.0f
 
     Config.motor_r.Kp = 50.0f;
-    Config.motor_r.Ki = 1.8f;
-    Config.motor_r.Kd = 0.0f;
+    Config.motor_r.Ki = 1.2f;
+    Config.motor_r.Kd = 0.7f;
     Config.motor_r.integral = 0.0f;
-    Config.motor_r.i_max = 99999.0f;
-    Config.motor_r.err_last = 99999.0f;
+    Config.motor_r.i_max = 8000.0f;
+    Config.motor_r.err_last = 0.0f;
     Config.motor_r.out_max = MOTOR_MAX_PWM; // 必须设为 10000.0f
 
-    // 5. 位置环默认值 (可选)
-    Config.position.Kp = 0.0f;
-    Config.position.Ki = 0.0f;
-    Config.position.Kd = 0.0f;
-    Config.position.integral = 0.0f;
-    Config.position.i_max = 1.0f;
-    Config.position.err_last = 0.0f;
-    Config.position.out_max = 0.5f; // 输出限幅通常设得很小，用于缓慢位置修正
+    // 3. 角速度环 (Gyro Loop: 平衡控制内环，抑制抖动)
+    Config.gyro_loop.Kp = 0.0005f; // 初始设为0，调参建议范围: 1.0 - 5.0
+    Config.gyro_loop.Ki = 0.0f; // 角速度环通常不需要积分
+    Config.gyro_loop.Kd = 0.0f;
+    Config.gyro_loop.integral = 0.0f;
+    Config.gyro_loop.i_max = 2000.0f;
+    Config.gyro_loop.err_last = 0.0f;
+    Config.gyro_loop.out_max = MOTOR_MAX_PWM;
 
-    // 6. 转向环限幅修改
-    Config.yaw.Kp = 0.0f;
-    Config.yaw.Ki = 0.0f;
-    Config.yaw.Kd = 0.0f;
-    Config.yaw.integral = 0.0f;
-    Config.yaw.i_max = 0.5f; // 转向积分限幅 (m/s)
-    Config.yaw.err_last = 0.0f;
-    Config.yaw.out_max = 1.0f; // 转向输出最大差速限制在 1.0m/s
+    // 4. 角度环 (Angle Loop: 平衡控制中环，维持直立)
+    Config.angle_loop.Kp = 0.0f; // 初始设为0，调参建议范围: 200 - 600
+    Config.angle_loop.Ki = 0.0f; // 角度环不建议使用积分，易导致低频震荡
+    Config.angle_loop.Kd = 0.0f; // 角度环的D项通常作用于角速度
+    Config.angle_loop.integral = 0.0f;
+    Config.angle_loop.i_max = 1000.0f;
+    Config.angle_loop.err_last = 0.0f;
+    Config.angle_loop.out_max = 5000.0f; // 限制角度环输出的幅度
+
+    // 5. 速度环 (Speed Loop: 平衡控制外环，维持静止/位移)
+    Config.speed_loop.Kp = 0.0f; // 初始设为0，调参建议范围: 50 - 200
+    Config.speed_loop.Ki = 0.0f; // 速度环必须有积分，用于消除静差（如坡道停车）
+    Config.speed_loop.Kd = 0.0f;
+    Config.speed_loop.integral = 0.0f;
+    Config.speed_loop.i_max = 3000.0f;
+    Config.speed_loop.err_last = 0.0f;
+    Config.speed_loop.out_max = 20.0f; // 速度环输出的是目标角度，不宜过大
+
+    // 6. 转向环 (Yaw Loop)
+    Config.yaw_loop.Kp = 0.0f;
+    Config.yaw_loop.Ki = 0.0f;
+    Config.yaw_loop.Kd = 0.0f;
+    Config.yaw_loop.integral = 0.0f;
+    Config.yaw_loop.i_max = 1000.0f;
+    Config.yaw_loop.err_last = 0.0f;
+    Config.yaw_loop.out_max = MOTOR_MAX_PWM;
 
     // 7. 运动参数
     Config.path.move_speed = 50;

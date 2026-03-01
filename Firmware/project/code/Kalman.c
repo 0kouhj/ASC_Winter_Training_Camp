@@ -107,6 +107,6 @@ void Attitude_Update(void) {
     State.yaw += gz * dt_for_ICM42688 * 180.0f / PI * 4.5; // 转换为度
 
     // Gyro 赋值
-    State.gyro_x = -Icm.gyro_x_dps;
+    State.gyro_x = -Icm.gyro_x_dps -0.12;
     State.gyro_y = Icm.gyro_y_dps;
 }

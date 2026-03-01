@@ -72,6 +72,7 @@ char line_str[]  = "*  DEBUG MODE ON  *\r\n";
 
 // Timewheel
 extern volatile uint8_t tick_flag; // 时间轮滴答标志
+extern volatile uint8_t tick_flag_2;
 // Timewheel
 int main(void)
 {
@@ -130,9 +131,9 @@ int main(void)
 
     add_task(1, All_Update);  // 每5ms更新所有控制相关任务
     add_task(30, Menu_Process);    // 每30ms处理菜单
-    add_task(100, battery_update); // 每100ms更新电池电压
+    //add_task(100, battery_update); // 每100ms更新电池电压
     add_task(30, key_scanner);     // 每25ms按键扫描
-    add_task(10, Bluetooth_Command_Process); // 每10ms处理蓝牙命令
+    //add_task(10, Bluetooth_Command_Process); // 每10ms处理蓝牙命令
 
     while (1)
     {
@@ -140,11 +141,17 @@ int main(void)
         // OLED_Clear();
         // test_key();
         // Debug
+        if (tick_flag_2)
+        {
+            //Control_Loop_1ms(0, 0);
+            tick_flag_2 = 0;
+        }
         if (tick_flag)
         {
             time_wheel_run();
             tick_flag = 0;
         }
+        
     }
 }
 // **************************** 代码区域 ****************************

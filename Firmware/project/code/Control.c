@@ -3,6 +3,7 @@
 #include "bsp_imu.h"
 #include "bsp_encoder.h"
 #include "bsp_motor.h"
+#include "math.h"
 
 /**
  * @brief 简化后的速度反馈（直接返回每毫秒脉冲数）
@@ -12,13 +13,9 @@ float Motion_Get_Speed_L(int32_t pulse_count)
     static float filtered_pulses_l = 0.0f; // 必须使用独立的静态变量
     const float alpha = 0.3f;              // 1ms下兼顾响应与平滑
 
-    // 根据实测值 200，设置 250 为物理极限限幅，超过即判定为干扰
-    if (pulse_count > 210)
-        pulse_count = 210;
-    if (pulse_count < -210)
-        pulse_count = -210;
-
     filtered_pulses_l = alpha * (float)pulse_count + (1.0f - alpha) * filtered_pulses_l;
+    if (fabsf(filtered_pulses_l) < 1.0f)
+        filtered_pulses_l = 0.0f;
     return filtered_pulses_l;
 }
 
@@ -27,25 +24,36 @@ float Motion_Get_Speed_R(int32_t pulse_count)
     static float filtered_pulses_r = 0.0f; // 必须使用独立的静态变量
     const float alpha = 0.3f;
 
-    if (pulse_count > 210)
-        pulse_count = 210;
-    if (pulse_count < -210)
-        pulse_count = -210;
-
     filtered_pulses_r = alpha * (float)pulse_count + (1.0f - alpha) * filtered_pulses_r;
+
+    if (fabsf(filtered_pulses_r) < 1.0f)
+        filtered_pulses_r = 0.0f;
+
     return filtered_pulses_r;
 }
 
 /**
- * @brief 通用 PID 计算函数
+ * @brief Motor PID 计算函数
  * @param pid  PID 结构体指针
  * @param error 当前误差 (目标值 - 实际值)
  * @return float 计算得出的 PWM 或 修正量
  */
-float PID_Compute(STRUCT_PID *pid, float error)
+float PID_Compute_Motor(STRUCT_PID *pid, float target, float actual)
 {
-    float p_out = pid->Kp * error;
+    float error = target - actual;
+    float current_kp = pid->Kp;
 
+    // --- 分段 Kp 逻辑：未达到目标速度 2/3 时，Kp 翻倍 ---
+    // 使用 fabsf 保证正反转逻辑一致
+    if (fabsf(actual) < fabsf(target) * 0.8f)
+    {
+        current_kp = pid->Kp * 2.5f; // 起步增益，可根据实际效果在 1.5~2.5 之间调整
+    }
+
+    // 1. P 输出
+    float p_out = current_kp * error;
+
+    // 2. I 输出 (累加误差)
     pid->integral += error;
     if (pid->integral > pid->i_max)
         pid->integral = pid->i_max;
@@ -54,9 +62,11 @@ float PID_Compute(STRUCT_PID *pid, float error)
 
     float i_out = pid->Ki * pid->integral;
 
+    // 3. D 输出 (误差变化率)
     float d_out = pid->Kd * (error - pid->err_last);
     pid->err_last = error;
 
+    // 4. 合并输出并进行最终限幅
     float out = p_out + i_out + d_out;
 
     if (out > pid->out_max)
@@ -66,121 +76,130 @@ float PID_Compute(STRUCT_PID *pid, float error)
 
     return out;
 }
-
-float PID_Simple(STRUCT_PID *pid, float target, float actual)
+/**
+ * @brief  位置式 PID 计算函数
+ * @param  pid:    指向 STRUCT_PID 结构体的指针
+ * @param  target: 目标值
+ * @param  real:   当前实际测量值
+ * @return float:  PID 计算后的输出值
+ */
+float pid_control(STRUCT_PID *pid, float target, float real)
 {
-    float error = target - actual;
+    float err = 0;  // 当前偏差
+    float diff = 0; // 微分项
+    float out = 0;  // 临时输出结果
 
-    // P
-    float p_out = pid->Kp * error;
+    // 1. 计算当前偏差 (Error)
+    err = target - real;
 
-    // I
-    pid->integral += error;
+    // 2. 积分项累加 (Integral)
+    pid->integral += err;
+
+    // 3. 积分抗饱和 (Anti-windup)
+    // 根据结构体定义中的 i_max 进行限幅
     if (pid->integral > pid->i_max)
         pid->integral = pid->i_max;
     if (pid->integral < -pid->i_max)
         pid->integral = -pid->i_max;
 
-    float i_out = pid->Ki * pid->integral;
+    // 4. 微分项计算 (Derivative)
+    // 使用当前偏差减去结构体中存储的 err_last
+    diff = err - pid->err_last;
 
-    // 输出
-    float out = p_out + i_out;
+    // 5. PID 公式拟合
+    out = (pid->Kp * err) + (pid->Ki * pid->integral) + (pid->Kd * diff);
 
+    // 6. 输出限幅
     if (out > pid->out_max)
         out = pid->out_max;
     if (out < -pid->out_max)
         out = -pid->out_max;
 
+    // 7. 更新历史偏差，供下次微分计算使用
+    pid->err_last = err;
+
     return out;
 }
 
 /**
- * @brief 平衡车核心控制循环 (5ms)
- * @note  所有输入数据（角度、角速度、速度）均由外部函数自动更新至 State 和 Icm 结构体
+ * @brief  平衡小车 1ms 核心控制函数
+ * @param  target_speed: 期望速度
+ * @param  target_yaw:   期望转向角
  */
-void Balance_Control_Loop(void)
+void Control_Loop_1ms(float target_speed, float target_yaw_rate)
 {
-    static uint8 velocity_cnt = 0;
-    static float speed_angle_offset = 0; // 速度环输出：期望角度补偿量
+    static uint8_t speed_count = 0;
+    static float speed_target_angle = 0.0f; // 速度环输出：期望倾角
 
-    // --- 1. 数据准备 (从 State 结构体直接读取) ---
-    float current_pitch = State.pitch;     // 姿态角度
-    float current_gyro_x = Icm.gyro_x_dps; // 绕X轴角速度
-
-    // 使用 State 中存储的电机实际速度反馈计算平均速度
-    float current_velocity = (State.motor_actual_speed_left + State.motor_actual_speed_right) / 2.0f;
-
-    // --- 2. 速度环 (外环 - 每 20ms 执行一次) ---
-    velocity_cnt++;
-    if (velocity_cnt >= 10)
+    // 0. 检查停机状态
+    if (State.is_stop)
     {
-        velocity_cnt = 0;
+        // 停机时清空所有积分项，防止复位瞬间产生巨大脉冲
+        Config.speed_loop.integral = 0;
+        Config.angle_loop.integral = 0;
+        Config.gyro_loop.integral = 0;
+        Config.motor_l.integral = 0;
+        Config.motor_r.integral = 0;
 
-        // 目标速度为 0 (原地平衡)
-        float speed_error = 0.0f - current_velocity;
-
-        // 使用 Config 结构体中的 Speed_PID 进行计算
-        speed_angle_offset = 0; // PID_Compute(&Config.speed, speed_error);
-    }
-
-    // --- 3. 直立环 (内环 - 每 5ms 执行一次) ---
-    // 目标角度 = 机械中值 + 速度环输出的角度修正
-    float target_pitch = Config.angle.mech_angle + speed_angle_offset;
-    float pitch_error = target_pitch - current_pitch;
-
-    // 计算直立控制量
-    // 使用 Config 结构体中的 angle_PID
-    // D项直接使用硬件滤波后的 gyro_x
-    float balance_control_out = Config.angle.angle_kp * pitch_error + Config.angle.angle_kd * current_gyro_x;
-
-    // --- 4. 转向环 (独立运行) ---
-    // 维持左右轮差速为 0
-    float turn_error = State.motor_actual_speed_left - State.motor_actual_speed_right;
-
-    // 使用 Config 结构体中的 Turn_PID
-    float turn_control_out = 0; // PID_Compute(&Config.yaw, turn_error);
-
-    // --- 5. 更新电机目标速度 ---
-    // 将计算结果写入 State 结构体中的目标速度变量
-    State.motor_target_speed_left = balance_control_out + turn_control_out;
-    State.motor_target_speed_right = balance_control_out - turn_control_out;
-
-    // --- 6. 倾倒安全保护 ---
-    if (current_pitch > 45.0f || current_pitch < -45.0f)
-    {
+        // 输出清零
         State.motor_target_speed_left = 0;
         State.motor_target_speed_right = 0;
-        State.is_stop = 1; // 停机保护
-        pwm_set_duty(PWM_CH1, 0);
-        pwm_set_duty(PWM_CH2, 0);
-        gpio_set_level(Motor_L_DIR1, 0);
-        gpio_set_level(Motor_L_DIR2, 1);
-        gpio_set_level(Motor_R_DIR1, 0);
-        gpio_set_level(Motor_R_DIR2, 1);
+        return;
     }
+
+    // --- 第一层：速度环 (Speed Loop) ---
+    // 20ms运行一次。速度环必须慢，否则会干扰平衡环的快速响应
+    speed_count++;
+    if (speed_count >= 20)
+    {
+        float current_speed = (State.motor_actual_speed_left + State.motor_actual_speed_right) / 2.0f;
+
+        // 速度环输出给角度环：为了往前走，车必须先往前倾
+        // 注意：此处输出通常需要限制在安全角度内（如 -15° 到 15°）
+        speed_target_angle = pid_control(&Config.speed_loop, target_speed, current_speed);
+        speed_count = 0;
+    }
+
+    // --- 第二层：角度环 (Angle Loop) ---
+    // 1ms运行一次。输入：期望倾角，反馈：当前加速度计计算出的 Pitch
+    // 角度环输出 = 目标角速度
+    float target_gyro_y = 0; // pid_control(&Config.angle_loop, speed_target_angle, State.pitch);
+
+    // --- 第三层：角速度环 (Gyro Loop) ---
+    // 1ms运行一次。这是最关键的内环，直接决定车的稳定性
+    // 输入：角度环给出的目标角速度，反馈：陀螺仪实时角速度 (State.gyro_y)
+    float balance_output = pid_control(&Config.gyro_loop, target_gyro_y, State.gyro_y);
+
+    // --- 转向环 (Yaw Loop) ---
+    // 转向通常作为差分量叠加。输入：目标转向速度，反馈：陀螺仪 Z 轴角速度
+    float yaw_output = 0; // pid_control(&Config.yaw_loop, target_yaw_rate, State.gyro_z);
+
+    // --- 最终输出叠加与映射 ---
+    // 1. 叠加平衡量与转向差分量
+    float out_l = balance_output + yaw_output;
+    float out_r = balance_output - yaw_output;
+
+    // 2. 这里的输出通常直接作为底层“电机电流环”或“电机速度环”的输入
+    // 如果没有底层环，则直接映射为 PWM 占空比。
+    // 注意：需根据实际电机性能进行限幅（例如 PWM 最大值为 10000）
+    State.motor_target_speed_left = out_l;
+    State.motor_target_speed_right = out_r;
 }
 
 void All_Update(void)
 {
-    static uint8_t ms2_cnt = 0;
-    static uint8_t debug_cnt = 0;
-    ms2_cnt++;
-    if (ms2_cnt >= 2)
-    {
-        ms2_cnt = 0;
-        //Balance_Control_Loop();
-        Attitude_Update();
-    }
+    static uint8_t speed_cnt = 0;
+
+    // 1ms 执行一次 IMU 更新
     ICM_Update();
-    if (debug_cnt++ >= 10)
-    {
-        debug_cnt = 0;
-        #ifndef DEBUG
-        #else
-                char str[128];
-                // sprintf(str, "%f,%f,%f\n", State.pitch, State.roll, State.yaw);
-                sprintf(str, "%f,%f,%f,%f\n", State.motor_actual_speed_left, State.motor_actual_speed_right, State.motor_target_speed_left, State.motor_target_speed_right);
-                uart_write_string(DEBUG_UART_INDEX, str);
-        #endif
-    }
+    Attitude_Update();
+
+    // 2. 输出姿态传感器数据
+    char str[128];
+    // sprintf(str, "%f,%f,%f,%f\n", State.pitch, State.roll, State.yaw,State.gyro_x);
+    // uart_write_string(DEBUG_UART_INDEX, str);
+
+    // 3. 输出电机速度控制逻辑
+    sprintf(str, "%f,%f,%f,%f\n", State.motor_target_speed_left, State.motor_target_speed_right, State.motor_actual_speed_left, State.motor_actual_speed_right);
+    uart_write_string(DEBUG_UART_INDEX, str);
 }

@@ -118,9 +118,10 @@ typedef struct
     STRUCT_ANGLE_PID angle;
     STRUCT_PID motor_l;
     STRUCT_PID motor_r;
-    STRUCT_PID speed;
-    STRUCT_PID position;
-    STRUCT_PID yaw;
+    STRUCT_PID speed_loop;
+    STRUCT_PID gyro_loop;
+    STRUCT_PID angle_loop;
+    STRUCT_PID yaw_loop;
     STRUCT_PATH_MOTION path;
     STRUCT_MODE_4 mode4;
     uint32_t checksum; // 校验码，判断Flash数据是否合法

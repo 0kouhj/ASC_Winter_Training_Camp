@@ -17,7 +17,7 @@
 #define MOTOR_MAX_PWM 10000.0f
 #define MOTOR_MIN_PWM 1000.0f    // 死区pwm值，根据实际电机调试修改
 #define MOTOR_PWM_FREQ 17000     // 电机PWM频率
-#define MOTOR_MAX_SPEED 80.0f // 电机最大速度，根据实际调试修改
+#define MOTOR_MAX_SPEED 65.0f // 电机最大速度，根据实际调试修改
 
 // --- 计算系数 ---
 // 脉冲转速度系数
@@ -34,8 +34,9 @@
 // 函数声明
 float Motion_Get_Speed_L(int32_t pulse_count);
 float Motion_Get_Speed_R(int32_t pulse_count);
-void Balance_Control_Loop(void);
-float PID_Compute(STRUCT_PID *pid, float error);
-float PID_Simple(STRUCT_PID *pid, float target, float actual);
+void Control_Loop_1ms(float target_speed, float target_yaw);
+float PID_Compute_Motor(STRUCT_PID *pid, float target, float actual);
+float pid_control(STRUCT_PID *pid, float target, float real);
+void Balance_Control(void);
 void All_Update(void);
 #endif
