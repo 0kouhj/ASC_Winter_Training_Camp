@@ -16,7 +16,7 @@ float Motion_Get_Speed_L(int32_t pulse_count)
     filtered_pulses_l = alpha * (float)pulse_count + (1.0f - alpha) * filtered_pulses_l;
     if (fabsf(filtered_pulses_l) < 1.0f)
         filtered_pulses_l = 0.0f;
-    return filtered_pulses_l;
+    return -filtered_pulses_l;
 }
 
 float Motion_Get_Speed_R(int32_t pulse_count)
@@ -29,7 +29,7 @@ float Motion_Get_Speed_R(int32_t pulse_count)
     if (fabsf(filtered_pulses_r) < 1.0f)
         filtered_pulses_r = 0.0f;
 
-    return filtered_pulses_r;
+    return -filtered_pulses_r;
 }
 
 /**
@@ -129,10 +129,13 @@ float pid_control(STRUCT_PID *pid, float target, float real)
 void Control_Loop_1ms(float target_speed, float target_yaw_rate)
 {
     static uint8_t speed_count = 0;
+    static uint8_t speed_count_1 = 0;
     static float speed_target_angle = 0.0f; // 速度环输出：期望倾角
 
-    // 0. 检查停机状态
-    if (State.is_stop)
+    float target_gyro_y = 0.0f;
+
+        // 0. 检查停机状态
+        if (State.is_stop)
     {
         // 停机时清空所有积分项，防止复位瞬间产生巨大脉冲
         Config.speed_loop.integral = 0;
@@ -156,14 +159,20 @@ void Control_Loop_1ms(float target_speed, float target_yaw_rate)
 
         // 速度环输出给角度环：为了往前走，车必须先往前倾
         // 注意：此处输出通常需要限制在安全角度内（如 -15° 到 15°）
-        speed_target_angle = pid_control(&Config.speed_loop, target_speed, current_speed);
+        speed_target_angle = 0;//pid_control(&Config.speed_loop, target_speed, current_speed);
         speed_count = 0;
     }
 
     // --- 第二层：角度环 (Angle Loop) ---
-    // 1ms运行一次。输入：期望倾角，反馈：当前加速度计计算出的 Pitch
+    // 5ms运行一次。输入：期望倾角，反馈：当前加速度计计算出的 Pitch
+    speed_count_1++;
     // 角度环输出 = 目标角速度
-    float target_gyro_y = 0; // pid_control(&Config.angle_loop, speed_target_angle, State.pitch);
+    if (speed_count_1 >=5)
+    {
+        speed_count_1 = 0;
+        target_gyro_y = 0;//pid_control(&Config.angle_loop, speed_target_angle, State.pitch);
+    }
+
 
     // --- 第三层：角速度环 (Gyro Loop) ---
     // 1ms运行一次。这是最关键的内环，直接决定车的稳定性

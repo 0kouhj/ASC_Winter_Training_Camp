@@ -5,22 +5,17 @@
 void motor_init(void)
 {
     // 初始化左电机方向引脚
-    gpio_init(Motor_L_DIR1, GPO, GPIO_LOW, GPO_PUSH_PULL);
-    gpio_init(Motor_L_DIR2, GPO, GPIO_LOW, GPO_PUSH_PULL);
+    gpio_init(Motor_L_DIR, GPO, GPIO_LOW, GPO_PUSH_PULL);
 
     // 初始化右电机方向引脚
-    gpio_init(Motor_R_DIR1, GPO, GPIO_LOW, GPO_PUSH_PULL);
-    gpio_init(Motor_R_DIR2, GPO, GPIO_LOW, GPO_PUSH_PULL);
+    gpio_init(Motor_R_DIR, GPO, GPIO_LOW, GPO_PUSH_PULL);
 
-    gpio_set_level(Motor_L_DIR1, 0);
-    gpio_set_level(Motor_L_DIR2, 1);
+    gpio_set_level(Motor_L_DIR, 0);
+    gpio_set_level(Motor_R_DIR, 0);
 
-    gpio_set_level(Motor_R_DIR1, 1);
-    gpio_set_level(Motor_R_DIR2, 0);
-    
     // 初始化PWM
-    pwm_init(PWM_CH1, MOTOR_PWM_FREQ, 0);
-    pwm_init(PWM_CH2, MOTOR_PWM_FREQ, 0);
+    pwm_init(PWM_L, MOTOR_PWM_FREQ, 1000); //L
+    pwm_init(PWM_R, MOTOR_PWM_FREQ, 1000);
 }
 
 void motor_set_left_speed(int16 speed)
@@ -39,8 +34,8 @@ void motor_stop(void)
     State.motor_target_speed_right = 0;
     Config.motor_l.integral = 0;
     Config.motor_r.integral = 0;
-    pwm_set_duty(PWM_CH1, 0);
-    pwm_set_duty(PWM_CH2, 0);
+    pwm_set_duty(PWM_L, 0);
+    pwm_set_duty(PWM_R, 0);
 }
 
 void motor_test_50_50(void)
@@ -67,12 +62,6 @@ void motor_test_neg100_neg100(void)
     State.motor_target_speed_right = -MOTOR_MAX_SPEED / 10;
 }
 
-void motor_test_deadzone(void)
-{
-    State.motor_target_speed_left = MOTOR_MIN_PWM;
-    State.motor_target_speed_right = MOTOR_MAX_PWM;
-}
-
 void motor_set_speed(int16_t left_speed, int16_t right_speed)
 {
     State.motor_target_speed_left = left_speed;
@@ -85,10 +74,17 @@ void motor_set_speed(int16_t left_speed, int16_t right_speed)
  */
 void motor_update(void)
 {
+    if (fabs(State.pitch)>=45.0f)
+    {
+        motor_stop();
+        State.is_stop = 1;
+        return;
+    }
     // 如果处于停机状态，直接切断动力
     if (State.is_stop)
     {
         motor_stop();
+        State.is_stop = 1;
         return;
     }
 
@@ -99,9 +95,9 @@ void motor_update(void)
     // 2. 添加死区补偿 (MOTOR_MIN_PWM = 1000)
     // 只要 PID 觉得该动，我们就给它起步的保底力
     if (pwm_l > 0.1f)
-        pwm_l += MOTOR_MIN_PWM;
+        pwm_l += MOTOR_MIN_PWM_L;
     else if (pwm_l < -0.1f)
-        pwm_l -= MOTOR_MIN_PWM;
+        pwm_l -= MOTOR_MIN_PWM_L;
 
     // 3. 检查是否超过最大限制 (MOTOR_MAX_PWM = 10000)
     // 必须在输出前做这步，否则底层驱动会因为 duty > 10000 报 Assert Error
@@ -113,24 +109,22 @@ void motor_update(void)
     // 4. 驱动硬件
     if (pwm_l >= 0)
     {
-        gpio_set_level(Motor_L_DIR1, 0);
-        gpio_set_level(Motor_L_DIR2, 1);
-        pwm_set_duty(PWM_CH1, (uint32)pwm_l);
+        gpio_set_level(Motor_L_DIR, 1);
+        pwm_set_duty(PWM_L, (uint32)pwm_l);
     }
     else
     {
-        gpio_set_level(Motor_L_DIR1, 1);
-        gpio_set_level(Motor_L_DIR2, 0);
-        pwm_set_duty(PWM_CH1, (uint32)(-pwm_l)); // 取绝对值输出
+        gpio_set_level(Motor_L_DIR, 0);
+        pwm_set_duty(PWM_L, (uint32)(-pwm_l)); // 取绝对值输出
     }
 
     /* ================= 右电机控制 (完全对称) ================= */
     float pwm_r = PID_Compute_Motor(&Config.motor_r, State.motor_target_speed_right, State.motor_actual_speed_right);
 
     if (pwm_r > 0.1f)
-        pwm_r += MOTOR_MIN_PWM;
+        pwm_r += MOTOR_MIN_PWM_R;
     else if (pwm_r < -0.1f)
-        pwm_r -= MOTOR_MIN_PWM;
+        pwm_r -= MOTOR_MIN_PWM_R;
 
     if (pwm_r > MOTOR_MAX_PWM)
         pwm_r = MOTOR_MAX_PWM;
@@ -139,14 +133,12 @@ void motor_update(void)
 
     if (pwm_r >= 0)
     {
-        gpio_set_level(Motor_R_DIR1, 1);
-        gpio_set_level(Motor_R_DIR2, 0);
-        pwm_set_duty(PWM_CH2, (uint32)pwm_r);
+        gpio_set_level(Motor_R_DIR, 1);
+        pwm_set_duty(PWM_R, (uint32)pwm_r);
     }
     else
     {
-        gpio_set_level(Motor_R_DIR1, 0);
-        gpio_set_level(Motor_R_DIR2, 1);
-        pwm_set_duty(PWM_CH2, (uint32)(-pwm_r));
+        gpio_set_level(Motor_R_DIR, 0);
+        pwm_set_duty(PWM_R, (uint32)(-pwm_r));
     }
 }

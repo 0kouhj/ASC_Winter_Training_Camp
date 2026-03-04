@@ -17,6 +17,4 @@ void motor_test_neg50_neg50(void);
 void motor_test_100_100(void);
 void motor_test_neg100_neg100(void);
 
-void motor_test_deadzone(void);
-
 #endif

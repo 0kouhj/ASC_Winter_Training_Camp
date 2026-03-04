@@ -110,7 +110,7 @@ void TIM6_IRQHandler(void)
 {
     // 此处编写用户代码
     tick_flag = 1;
-    Control_Loop_1ms(0,0);
+    //Control_Loop_1ms(0,0);
     encoder_update();
     motor_update();
     tick_flag_2 = 1;

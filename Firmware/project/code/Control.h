@@ -15,9 +15,10 @@
 
 // --- 电机硬件参数 ---
 #define MOTOR_MAX_PWM 10000.0f
-#define MOTOR_MIN_PWM 1000.0f    // 死区pwm值，根据实际电机调试修改
+#define MOTOR_MIN_PWM_L 660.0f    // 死区pwm值，根据实际电机调试修改
+#define MOTOR_MIN_PWM_R 750.0f
 #define MOTOR_PWM_FREQ 17000     // 电机PWM频率
-#define MOTOR_MAX_SPEED 65.0f // 电机最大速度，根据实际调试修改
+#define MOTOR_MAX_SPEED 80.0f // 电机最大速度，根据实际调试修改
 
 // --- 计算系数 ---
 // 脉冲转速度系数

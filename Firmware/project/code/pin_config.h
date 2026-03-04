@@ -27,8 +27,8 @@
 #define OLED_SDA (A5)
 
 // 电机
-#define PWM_CH2 (TIM5_PWM_CH1_A0)
-#define PWM_CH1 (TIM5_PWM_CH2_A1)
+#define PWM_R (TIM5_PWM_CH2_A1)
+#define PWM_L (TIM5_PWM_CH1_A0)
 
 #define ENCODER_RIGHT_A (TIM3_ENCODER_CH1_B4)
 #define ENCODER_RIGHT_B (TIM3_ENCODER_CH2_B5)
@@ -36,11 +36,9 @@
 #define ENCODER_LEFT_A (TIM4_ENCODER_CH1_B6)
 #define ENCODER_LEFT_B (TIM4_ENCODER_CH2_B7)
 
-#define Motor_L_DIR1 (A2)
-#define Motor_L_DIR2 (A3)
+#define Motor_L_DIR (D5)
 
-#define Motor_R_DIR1 (D5)
-#define Motor_R_DIR2 (D6)
+#define Motor_R_DIR (D6)
 
 // 软件定义
 
