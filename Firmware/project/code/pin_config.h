@@ -45,4 +45,7 @@
 #define TIME_TIM (TIM6_PIT)
 #define TIME_PRIORITY (TIM6_IRQn)
 
+#define IMU_TIM (TIM7_PIT)
+#define IMU_PRIORITY (TIM7_IRQn)
+
 #endif

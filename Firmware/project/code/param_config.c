@@ -63,39 +63,39 @@ void Param_Init(void)
     Config.boot.boot_mode = MODE_1;
 
     // 2. 电机环默认值
-    Config.motor_l.Kp = 15.0f;
-    Config.motor_l.Ki = 0.0f; // 适量积分消除稳态误差
-    Config.motor_l.Kd = 0.0f;
+    Config.motor_l.Kp = 80.0f;
+    Config.motor_l.Ki = 2.0f; // 适量积分消除稳态误差
+    Config.motor_l.Kd = 0.5f;
     Config.motor_l.integral = 0.0f;
     Config.motor_l.i_max = 8000.0f; // 积分限幅，设为输出上限的一半
     Config.motor_l.err_last = 0.0f;
     Config.motor_l.out_max = MOTOR_MAX_PWM; // 必须设为 10000.0f
 
-    Config.motor_r.Kp = 15.0f;
-    Config.motor_r.Ki = 0.0f;
-    Config.motor_r.Kd = 0.0f;
+    Config.motor_r.Kp = 80.0f;
+    Config.motor_r.Ki = 2.0f;
+    Config.motor_r.Kd = 0.5f;
     Config.motor_r.integral = 0.0f;
     Config.motor_r.i_max = 8000.0f;
     Config.motor_r.err_last = 0.0f;
     Config.motor_r.out_max = MOTOR_MAX_PWM; // 必须设为 10000.0f
 
     // 3. 角速度环 (Gyro Loop: 平衡控制内环，抑制抖动)
-    Config.gyro_loop.Kp = -0.8f; // 初始设为0，调参建议范围
-    Config.gyro_loop.Ki = -0.0f; // 角速度环通常不需要积分
+    Config.gyro_loop.Kp = -1.05f; // 初始设为0，调参建议范围
+    Config.gyro_loop.Ki = 0.0f; // 角速度环通常不需要积分
     Config.gyro_loop.Kd = 0.0f;
     Config.gyro_loop.integral = 0.0f;
-    Config.gyro_loop.i_max = 2000.0f;
+    Config.gyro_loop.i_max = 9000.0f;
     Config.gyro_loop.err_last = 0.0f;
     Config.gyro_loop.out_max = MOTOR_MAX_PWM;
 
     // 4. 角度环 (Angle Loop: 平衡控制中环，维持直立)
-    Config.angle_loop.Kp = 14.0f; // 初始设为0，调参建议范围: 200 - 600
+    Config.angle_loop.Kp = 4.4f; // 初始设为0，调参建议范围: 200 - 600
     Config.angle_loop.Ki = 0.0f; // 角度环不建议使用积分，易导致低频震荡
     Config.angle_loop.Kd = 0.0f; // 角度环的D项通常作用于角速度
     Config.angle_loop.integral = 0.0f;
-    Config.angle_loop.i_max = 1000.0f;
+    Config.angle_loop.i_max = 9000.0f;
     Config.angle_loop.err_last = 0.0f;
-    Config.angle_loop.out_max = 5000.0f; // 限制角度环输出的幅度
+    Config.angle_loop.out_max = 99000.0f; // 限制角度环输出的幅度
 
     // 5. 速度环 (Speed Loop: 平衡控制外环，维持静止/位移)
     Config.speed_loop.Kp = 0.0f; // 初始设为0，调参建议范围: 50 - 200
@@ -121,3 +121,6 @@ void Param_Init(void)
 
     Config.checksum = 0x12345678;
 }
+
+volatile uint8_t sys_ready;
+volatile uint16_t fuck_imu;

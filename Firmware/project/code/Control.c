@@ -159,7 +159,7 @@ void Control_Loop_1ms(float target_speed, float target_yaw_rate)
 
         // 速度环输出给角度环：为了往前走，车必须先往前倾
         // 注意：此处输出通常需要限制在安全角度内（如 -15° 到 15°）
-        speed_target_angle = 0;//pid_control(&Config.speed_loop, target_speed, current_speed);
+        speed_target_angle = pid_control(&Config.speed_loop, target_speed, current_speed);
         speed_count = 0;
     }
 
@@ -170,7 +170,7 @@ void Control_Loop_1ms(float target_speed, float target_yaw_rate)
     if (speed_count_1 >=5)
     {
         speed_count_1 = 0;
-        target_gyro_y = 0;//pid_control(&Config.angle_loop, speed_target_angle, State.pitch);
+        target_gyro_y = pid_control(&Config.angle_loop, speed_target_angle, State.pitch);
     }
 
 
@@ -200,15 +200,13 @@ void All_Update(void)
     static uint8_t speed_cnt = 0;
 
     // 1ms 执行一次 IMU 更新
-    ICM_Update();
-    Attitude_Update();
 
     // 2. 输出姿态传感器数据
-    char str[128];
+    //char str[128];
     // sprintf(str, "%f,%f,%f,%f\n", State.pitch, State.roll, State.yaw,State.gyro_x);
     // uart_write_string(DEBUG_UART_INDEX, str);
 
     // 3. 输出电机速度控制逻辑
-    sprintf(str, "%f,%f,%f,%f\n", State.motor_target_speed_left, State.motor_target_speed_right, State.motor_actual_speed_left, State.motor_actual_speed_right);
-    uart_write_string(DEBUG_UART_INDEX, str);
+    //sprintf(str, "%f,%f,%f,%f\n", State.motor_target_speed_left, State.motor_target_speed_right, State.motor_actual_speed_left, State.motor_actual_speed_right);
+    //uart_write_string(DEBUG_UART_INDEX, str);
 }

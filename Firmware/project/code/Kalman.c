@@ -100,13 +100,13 @@ void Attitude_Update(void) {
     float accel_roll = atan2f(ax, sqrtf(ay*ay + az*az)) * 180.0f / PI;
 
     // 使用卡尔曼滤波
-    State.pitch = -Kalman_GetAngle(&kalman_pitch, accel_pitch, gx);
+    State.pitch = -Kalman_GetAngle(&kalman_pitch, accel_pitch, gx)+ 1.8f;
     State.roll = Kalman_GetAngle(&kalman_roll, accel_roll, gy);
 
     // Yaw 使用陀螺仪积分 (无磁力计)
     State.yaw += gz * dt_for_ICM42688 * 180.0f / PI * 4.5; // 转换为度
 
     // Gyro 赋值
-    State.gyro_x = -Icm.gyro_x_dps -0.12;
+    State.gyro_x = -Icm.gyro_x_dps -0.24;
     State.gyro_y = Icm.gyro_y_dps;
 }

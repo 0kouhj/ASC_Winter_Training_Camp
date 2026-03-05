@@ -55,7 +55,7 @@
 #include "kalman.h"
 
 #include "Menu.h"
-#include "Control.h"    
+#include "Control.h"
 
 #include "test.h"
 #include "param_config.h"
@@ -67,7 +67,7 @@ static void OLED_Start(void);
 // 函数声明
 
 // DEBUG
-char line_str[]  = "*  DEBUG MODE ON  *\r\n";
+char line_str[] = "*  DEBUG MODE ON  *\r\n";
 // DEBUG
 
 // Timewheel
@@ -82,6 +82,9 @@ int main(void)
     // TIM 与 Encoder
     pit_ms_init(TIME_TIM, 1); // 使用TIM6进行按键扫描
     interrupt_set_priority(TIME_PRIORITY, 0);
+
+    pit_ms_init(IMU_TIM, 1);
+    interrupt_set_priority(IMU_PRIORITY, 1);
     // TIM 与 Encoder
 
     // 数据初始化
@@ -107,7 +110,7 @@ int main(void)
 
     // 自检
     LED_On(ALL);
-    //Buzzer_On();
+    // Buzzer_On();
     OLED_Start();
     if (ICM42688_I2C_Init() != 0)
     {
@@ -129,11 +132,13 @@ int main(void)
 
     OLED_Clear();
 
-    add_task(1, All_Update);  // 每5ms更新所有控制相关任务
-    add_task(30, Menu_Process);    // 每30ms处理菜单
-    //add_task(100, battery_update); // 每100ms更新电池电压
-    add_task(30, key_scanner);     // 每25ms按键扫描
-    //add_task(10, Bluetooth_Command_Process); // 每10ms处理蓝牙命令
+    add_task(1, All_Update);    // 每5ms更新所有控制相关任务
+    add_task(30, Menu_Process); // 每30ms处理菜单
+    // add_task(100, battery_update); // 每100ms更新电池电压
+    add_task(30, key_scanner); // 每25ms按键扫描
+    // add_task(10, Bluetooth_Command_Process); // 每10ms处理蓝牙命令
+
+    sys_ready =1;
 
     while (1)
     {
@@ -141,17 +146,11 @@ int main(void)
         // OLED_Clear();
         // test_key();
         // Debug
-        if (tick_flag_2)
-        {
-            //Control_Loop_1ms(0, 0);
-            tick_flag_2 = 0;
-        }
         if (tick_flag)
         {
             time_wheel_run();
             tick_flag = 0;
         }
-        
     }
 }
 // **************************** 代码区域 ****************************

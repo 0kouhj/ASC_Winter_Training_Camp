@@ -131,6 +131,11 @@ typedef struct
 extern SYSTEM_CONFIG_T Config;
 extern SYSTEM_STATE_T State;
 extern ICM42688_t Icm;
+
+// 系统准备
+extern volatile uint8_t sys_ready;
+extern volatile uint16_t fuck_imu;
+
 // 函数声明
 void Param_Init(void);
 

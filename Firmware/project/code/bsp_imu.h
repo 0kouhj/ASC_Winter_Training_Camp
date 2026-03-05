@@ -22,4 +22,5 @@
 uint8 ICM42688_I2C_Init(void);
 void ICM42688_I2C_Read_Data(ICM42688_t *dev);
 void ICM_Update(void);
+void ICM_Update_Gyro_Only(void);
 #endif

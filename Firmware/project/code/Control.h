@@ -15,8 +15,8 @@
 
 // --- 电机硬件参数 ---
 #define MOTOR_MAX_PWM 10000.0f
-#define MOTOR_MIN_PWM_L 660.0f    // 死区pwm值，根据实际电机调试修改
-#define MOTOR_MIN_PWM_R 750.0f
+#define MOTOR_MIN_PWM_L 450.0f    // 死区pwm值，根据实际电机调试修改
+#define MOTOR_MIN_PWM_R 450.0f
 #define MOTOR_PWM_FREQ 17000     // 电机PWM频率
 #define MOTOR_MAX_SPEED 80.0f // 电机最大速度，根据实际调试修改
 
@@ -25,12 +25,6 @@
 #define PULSE_TO_MPS_FACTOR (WHEEL_PERIMETER / (ENCODER_RESOLUTION * ENCODER_MULTI * GEAR_RATIO * SAMPLE_TIME_S))
 // 速度转PWM系数
 #define MPS_TO_PWM_FACTOR (MOTOR_MAX_PWM / MOTOR_MAX_SPEED_MPS)
-
-#define SPEED_ZERO_TH 0.05f    // m/s，认为是“零速”的阈值
-#define SPEED_DISTURB_TH 0.30f // m/s，人为拨轮子阈值
-#define KP_LOW_SPEED_GAIN 1.5f // 低速 Kp 放大倍数
-#define MOTOR_DAMP_K 2500.0f   // 零速阻尼系数（PWM / (m/s)）
-#define SPEED_LOW_TH 0.20f     // m/s，低速区
 
 // 函数声明
 float Motion_Get_Speed_L(int32_t pulse_count);

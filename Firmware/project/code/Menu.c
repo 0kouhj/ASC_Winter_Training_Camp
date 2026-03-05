@@ -587,6 +587,7 @@ void Menu_RefreshDisplay(void)
         line++;
         displayed_count++;
     }
+    OLED_ShowNum(0,0,fuck_imu,5,OLED_6X8);
     OLED_Update();
 }
 

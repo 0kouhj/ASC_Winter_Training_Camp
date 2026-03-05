@@ -14,8 +14,8 @@ void motor_init(void)
     gpio_set_level(Motor_R_DIR, 0);
 
     // 初始化PWM
-    pwm_init(PWM_L, MOTOR_PWM_FREQ, 1000); //L
-    pwm_init(PWM_R, MOTOR_PWM_FREQ, 1000);
+    pwm_init(PWM_L, MOTOR_PWM_FREQ, 0); //L
+    pwm_init(PWM_R, MOTOR_PWM_FREQ, 0);
 }
 
 void motor_set_left_speed(int16 speed)
@@ -87,6 +87,7 @@ void motor_update(void)
         State.is_stop = 1;
         return;
     }
+    
 
     /* ================= 左电机控制 ================= */
     // 1. 调用 PID_Compute 计算基础输出

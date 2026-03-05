@@ -41,7 +41,6 @@
 #include "bsp_imu.h"
 
 extern volatile uint8_t tick_flag;
-extern volatile uint8_t tick_flag_2;
 //-------------------------------------------------------------------------------------------------------------------
 // 函数简介     TIM1 的定时器更新中断服务函数 启动 .s 文件定义 不允许修改函数名称
 //              默认优先级 修改优先级使用 interrupt_set_priority(TIM1_UP_IRQn, 1);
@@ -108,12 +107,26 @@ void TIM5_IRQHandler(void)
 //-------------------------------------------------------------------------------------------------------------------
 void TIM6_IRQHandler(void)
 {
-    // 此处编写用户代码
-    tick_flag = 1;
-    //Control_Loop_1ms(0,0);
-    encoder_update();
-    motor_update();
-    tick_flag_2 = 1;
+    if (sys_ready){
+        // 此处编写用户代码
+        static uint8_t count = 0;
+        count++;
+        if (count >= 5)
+        {
+            ICM_Update();
+            count = 0;
+        }
+        else
+        {
+            ICM_Update_Gyro_Only();
+            fuck_imu++;
+        }
+        tick_flag = 1;
+        Attitude_Update();
+        Control_Loop_1ms(0,0);
+        encoder_update();
+        motor_update();
+    }
     
     // 此处编写用户代码
     TIM6->SR &= ~TIM6->SR; // 清空中断状态
@@ -126,7 +139,11 @@ void TIM6_IRQHandler(void)
 void TIM7_IRQHandler(void)
 {
     // 此处编写用户代码
-
+    if (sys_ready)
+    {
+        
+        // 此处编写用户代码
+    }
     // 此处编写用户代码
     TIM7->SR &= ~TIM7->SR; // 清空中断状态
 }

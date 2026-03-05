@@ -14,8 +14,8 @@
 // 简单的延时，用于控制 I2C 速率 (约 400kHz)
 static void i2c_delay(void)
 {
-    for (volatile uint8 i = 0; i < 5; i++)
-        ;
+    //for (volatile uint8 i = 0; i < 2; i++)
+    //    ;
 }
 
 // SDA 切换为输出
@@ -173,6 +173,27 @@ uint8 ICM42688_I2C_Init(void)
     icm_i2c_write_reg(ICM42688_REG_ACCEL_CONFIG0, 0x06); // 16g, 1kHz
 
     return 0;
+}
+
+void ICM_Update_Gyro_Only(void)
+{
+    uint8 data[6];
+    // ICM42688 陀螺仪数据从 GYRO_DATA_X1 (0x25) 开始
+    icm_i2c_read_regs(0x25, data, 6);
+
+    // 组合高低位
+    Icm.gyro_x_raw = (int16)((data[0] << 8) | data[1]);
+    Icm.gyro_y_raw = (int16)((data[2] << 8) | data[3]);
+    Icm.gyro_z_raw = (int16)((data[4] << 8) | data[5]);
+
+    // 转换为 dps (2000dps 对应 16.4)
+    Icm.gyro_x_dps = (float)Icm.gyro_x_raw / 16.4f;
+    Icm.gyro_y_dps = (float)Icm.gyro_y_raw / 16.4f;
+    Icm.gyro_z_dps = (float)Icm.gyro_z_raw / 16.4f;
+
+    // 同步给状态机
+    State.gyro_y = Icm.gyro_y_dps;
+    State.gyro_z = Icm.gyro_z_dps;
 }
 
 void ICM42688_I2C_Read_Data(ICM42688_t *dev)

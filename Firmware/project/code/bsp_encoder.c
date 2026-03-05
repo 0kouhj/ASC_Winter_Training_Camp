@@ -23,7 +23,7 @@ void encoder_get_left(void)
 
     // 2. 通过中间层函数进行“信号调理”（滤波、限幅）
     // 这样 State 里的数据就是平滑的 float，PID 算起来才不会有毛刺
-    State.motor_actual_speed_left = Motion_Get_Speed_L(raw_count);
+    State.motor_actual_speed_right = Motion_Get_Speed_L(raw_count);
 }
 
 /**
@@ -34,7 +34,7 @@ void encoder_get_right(void)
     int32_t raw_count = (int32_t)encoder_get_count(TIM3_ENCODER);
     encoder_clear_count(TIM3_ENCODER);
 
-    State.motor_actual_speed_right = Motion_Get_Speed_R(raw_count);
+    State.motor_actual_speed_left = Motion_Get_Speed_R(raw_count);
 }
 
 #define MAX_REASONABLE_PULSE 500 // 5ms内电机不可能超过500脉冲，超过即为毛刺
